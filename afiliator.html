@@ -244,6 +244,12 @@ var JPL=(function(){
   return {start:start,xhr:xhr,work:work,sleep:sleep};
 })();
 </script>
+<style>
+.pw{position:relative}.pw input{width:100%;padding-right:52px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;margin:0;display:grid;place-items:center;background:transparent;color:var(--mute);border:0;box-shadow:none;border-radius:10px;cursor:pointer}
+.eye:hover{color:var(--pink);background:var(--soft)}.eye:focus-visible{outline:3px solid var(--pink);outline-offset:1px}
+.eye svg[hidden]{display:none}
+</style>
 </head>
 <body>
 <main id="login" class="login"><section class="card logincard">
@@ -253,7 +259,7 @@ var JPL=(function(){
 <label for="kode">Kode referral</label>
 <input id="kode" type="text" autocapitalize="characters" maxlength="20" autocomplete="username">
 <label for="pin">PIN (6 digit dari PIC)</label>
-<input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+<div class="pw"><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password"><button type="button" id="pinEye" class="eye" aria-label="Tampilkan PIN" aria-pressed="false"><svg class="eye-on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19c-7 0-11-7-11-7a19.8 19.8 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a19.9 19.9 0 0 1-3.17 4.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg></button></div>
 <p id="loginMsg" class="msg bad" role="alert" hidden></p>
 <button id="loginBtn" class="full">Masuk</button>
 </section></main>
@@ -382,6 +388,12 @@ const Shell = (() => {
 const API_URL = 'https://script.google.com/macros/s/AKfycbwQ115XVOEhwNOC05oTR1VnxRn-gyVgfbrBgZ4d4YsKGWoifrnU7-L8Y2bUadGOVrWBzw/exec';
 // ===================================================================
 const $ = id => document.getElementById(id);
+function setPinVisible(on) {
+  $('pin').type = on ? 'text' : 'password';
+  $('pinEye').setAttribute('aria-pressed', String(on)); $('pinEye').setAttribute('aria-label', on ? 'Sembunyikan PIN' : 'Tampilkan PIN');
+  $('pinEye').querySelector('.eye-on').hidden = on; $('pinEye').querySelector('.eye-off').hidden = !on;
+}
+document.addEventListener('DOMContentLoaded', () => { $('pinEye').addEventListener('click', () => { setPinVisible($('pin').type === 'password'); $('pin').focus(); }); });
 const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
 const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
 let TOKEN = '', D = null, timer = null;
@@ -405,7 +417,7 @@ $('loginBtn').onclick = async () => {
   try {
     const r = await JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify({ action: 'aff_login', kode: $('kode').value, pin: $('pin').value }) }, 'Memeriksa kode dan PIN');
     if (!r.ok) throw new Error(r.error);
-    TOKEN = r.token; $('pin').value = '';
+    TOKEN = r.token; $('pin').value = ''; setPinVisible(false);
     try { sessionStorage.setItem('at', TOKEN); } catch (e) {}
     start();
   } catch (e) { m.textContent = e.message || 'Gagal masuk. Periksa koneksi.'; m.hidden = false; }
