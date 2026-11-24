@@ -397,7 +397,7 @@ function renderAfil() {
   $('t-afil').innerHTML = '<div class="two"><div class="card"><h2>Funnel rekrutmen</h2>' + bars +
     '<p class="meta">Menolak: ' + f.menolak + '. Belum dihubungi: ' + f.belum + '.</p></div>' +
     '<div class="card"><h2>Sesi Zoom (maks. 10 per hari)</h2><p>' + zoom + '</p>' +
-    '<h2 style="margin-top:14px">Tambah afiliator</h2><div class="f4"><div><label for="nKode">Kode</label><input id="nKode" maxlength="20"></div><div><label for="nNama">Nama</label><input id="nNama"></div>' +
+    '<h2 style="margin-top:14px">Tambah afiliator</h2><div class="f4"><div><label for="nKode">Kode</label><input id="nKode" maxlength="20"><button type="button" id="nGen" class="sm soft" style="margin-top:6px;width:100%">Buat kode dari nama</button></div><div><label for="nNama">Nama</label><input id="nNama"></div>' +
     '<div><label for="nAkun">Akun</label><input id="nAkun"></div><div><label for="nJalur">Jalur</label><select id="nJalur"><option value="mandiri">mandiri</option><option value="tambahan">tambahan</option></select></div><button id="nBtn">Tambah</button></div>' +
     '<p class="meta">Afiliator baru nonaktif sampai Anda mencentang Aktif. PIN dibuat lewat menu JP SMART SIM di Google Sheet.</p></div></div>' +
     '<div class="card"><h2>Daftar afiliator</h2>' + tbl([['Kode'], ['Nama'], ['Jalur'], ['Status'], ['Zoom'], ['Kartu dicetak'], ['Aktif'], ['PIN'], ['Konten', 1], ['']], rows, 'Belum ada afiliator.') + '</div>';
@@ -446,8 +446,19 @@ function renderSistem() {
 }
 
 document.addEventListener('click', async e => {
-  const b = e.target.closest('button[data-act],#nBtn,#konv,#csv'); if (!b) return;
+  const b = e.target.closest('button[data-act],#nBtn,#nGen,#konv,#csv'); if (!b) return;
   const act = b.dataset.act || b.id;
+  if (act === 'nGen') {
+    const first = String($('nNama').value || '').trim().split(/\s+/)[0] || '';
+    const base = first.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 14);
+    if (!base) return say('Isi nama afiliator dulu, lalu klik Buat kode.', 'bad');
+    const used = {}; (D.afiliator || []).forEach(a => { used[String(a.kode).toUpperCase()] = 1; });
+    let kode = '', i = 0;
+    do { kode = base + String(Math.floor(Math.random() * 100)).padStart(2, '0'); i++; } while (used[kode] && i < 200);
+    if (used[kode]) return say('Semua kombinasi untuk nama ini sudah terpakai. Isi kode secara manual.', 'bad');
+    $('nKode').value = kode; say('Kode dibuat: ' + kode + '. Klik Buat kode lagi untuk angka lain.', 'good');
+    return;
+  }
   async function run(fn, ok) {
     b.disabled = true;
     try { const r = await fn(); if (!r.ok) say(r.error, 'bad'); else { say(ok(r), 'good'); await load(true, true); } }
