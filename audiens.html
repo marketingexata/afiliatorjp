@@ -149,6 +149,7 @@ var JPL=(function(){
 })();
 </script>
 <style>.brandlogo{display:block;height:54px;max-width:200px;object-fit:contain;margin:0 0 12px}:root{--jpl2:#45bcc4}</style>
+<style>.sosrow{display:grid;grid-template-columns:140px 1fr;gap:8px}@media(max-width:360px){.sosrow{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <main>
@@ -173,6 +174,13 @@ var JPL=(function(){
       <option>Tokyo</option><option>Chiba</option><option>Saitama</option><option>Kanagawa</option>
       <option>Ibaraki</option><option>Tochigi</option><option>Gunma</option><option>Lainnya (di luar Kanto)</option>
     </select>
+
+    <label for="sosPlat">Akun sosial media <span class="hint" style="display:inline">(opsional)</span></label>
+    <div class="sosrow">
+      <select id="sosPlat" aria-label="Platform sosial media"><option>Instagram</option><option>TikTok</option></select>
+      <input id="sosAkun" type="text" maxlength="60" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="@username" aria-label="Username sosial media">
+    </div>
+    <p class="hint">Tulis username saja, tanpa spasi. Contoh: @namakamu</p>
 
     <label for="kode">Kode referral</label>
     <input id="kode" type="text" maxlength="20" autocapitalize="characters" placeholder="Kode dari afiliator">
@@ -263,6 +271,7 @@ $('form').addEventListener('submit', async ev => {
   const payload = {
     action: 'daftar',
     nama: $('nama').value, whatsapp: $('wa').value, prefektur: $('pref').value,
+    sosmed_platform: $('sosPlat').value, sosmed_akun: $('sosAkun').value,
     kode: $('kode').value, setuju: $('setuju').checked, website: $('website').value,
   };
   const btn = $('btn'); const label = btn.textContent;
