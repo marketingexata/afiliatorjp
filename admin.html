@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff1d7c">
+<meta name="robots" content="noindex">
+<title>Admin JP SMART SIM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#f0156e;--acc:#f0156e;--crimson:#d4005a;--ink:#24112f;--mute:#7b6687;--line:#f3d6e5;--soft:#fff0f6;--soft2:#ffe0ee;--ok:#1f9d63;--ok-bg:#e3f6ec;--warn:#8a3d00;--warn-bg:#fff3e0;--err:#d92d20;--bar2:#ff9f1c;--navy:#1a1033;--gold:#ffe600;--grad:linear-gradient(135deg,#ff2d86,#d4005a);--side-w:264px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;color:var(--ink);font:15px/1.55 "Plus Jakarta Sans","Avenir Next","Segoe UI",system-ui,sans-serif;background:#c2005a}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,#ff1d7c 0%,#ff4f9a 48%,#c2005a 100%)}
+body.lock{overflow:hidden}
+body.has-bar .content{padding-bottom:120px}
+h1{font-size:1.35rem;line-height:1.25;margin:0}
+h2{font-size:1.05rem;margin:0 0 10px}
+.ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* ---- shell: sidebar desktop, drawer kanan di HP ---- */
+.side{position:fixed;z-index:50;top:0;bottom:0;right:0;width:min(84vw,320px);background:#fff;border-radius:24px 0 0 24px;box-shadow:-12px 0 40px rgba(60,0,30,.35);transform:translateX(100%);transition:transform .28s ease;display:flex;flex-direction:column;padding:18px 14px;padding-top:max(18px,env(safe-area-inset-top));padding-bottom:max(18px,env(safe-area-inset-bottom));overflow-y:auto}
+.side.open{transform:none}
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(40,0,25,.55)}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{display:block;line-height:1.2}
+.brand small{color:var(--mute);font-weight:600}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:0 8px 18px rgba(212,0,90,.3)}
+.who{margin-top:14px;padding:10px 12px;border-radius:14px;background:var(--soft)}
+.who b{display:block;overflow-wrap:anywhere}
+.who span{color:var(--mute);font-size:.84rem}
+.nav{display:flex;flex-direction:column;gap:4px;margin:14px 0}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;background:transparent;color:var(--ink);font-weight:700;box-shadow:none}
+.nav button:hover{background:var(--soft)}
+.nav button[aria-current=page]{background:var(--grad);color:#fff;box-shadow:0 8px 18px rgba(212,0,90,.28)}
+.cnt{margin-left:auto;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--gold);color:var(--navy);font-size:.75rem;font-weight:800;display:grid;place-items:center}
+.side-foot{margin-top:auto;display:grid;gap:8px}
+.side-foot button{display:flex;align-items:center;justify-content:center;gap:8px}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));background:rgba(200,0,90,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;border-bottom:1px solid rgba(255,255,255,.2)}
+.top-t{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.iconbtn,.burger{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:14px;flex:none}
+.burger{background:rgba(255,255,255,.2);box-shadow:none;border:1px solid rgba(255,255,255,.35)}
+.iconbtn{background:var(--soft2);color:#c2185b;box-shadow:none}
+.content{padding:14px 14px 48px;max-width:1040px;margin:0 auto}
+@media(min-width:900px){
+ .side{transform:none;right:auto;left:16px;top:16px;bottom:16px;width:var(--side-w);border-radius:24px;box-shadow:0 18px 50px rgba(60,0,30,.3);z-index:20}
+ .main{margin-left:calc(var(--side-w) + 32px)}
+ .burger,.closeside{display:none}
+ .scrim{display:none!important}
+ .top{padding:16px 24px}
+ .content{padding:12px 24px 56px}
+}
+@media(prefers-reduced-motion:reduce){.side{transition:none}}
+/* ---- komponen ---- */
+.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px rgba(80,0,40,.18)}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.logincard{width:100%;max-width:420px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-radius:99px;padding:8px 16px;font-weight:700}
+.pill b{color:var(--gold)}
+.pill.sm{padding:4px 12px;font-size:.82rem}
+.banner{border-radius:18px;padding:12px 16px;margin-bottom:12px;background:var(--navy);color:#fff;font-weight:600}
+.banner b{color:var(--gold)}
+.banner.paid,.banner.info{background:var(--warn-bg);color:var(--warn);border-left:5px solid var(--bar2)}
+.note{border-radius:14px;padding:10px 14px;margin-bottom:8px;background:var(--warn-bg);color:var(--warn);font-weight:600}
+.note.ok{background:var(--ok-bg);color:var(--ok)}
+label{display:block;font-weight:700;margin:12px 0 4px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:14px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 4px rgba(240,21,110,.16)}
+input[readonly]{background:var(--soft)}
+td input,td select{padding:6px 8px;min-width:70px;border-radius:10px}
+input[type=checkbox]{width:20px;height:20px;padding:0;accent-color:var(--pink)}
+button{font:inherit;font-weight:800;padding:12px 18px;border:0;border-radius:14px;cursor:pointer;color:#fff;background:var(--grad);box-shadow:0 8px 18px rgba(212,0,90,.25)}
+button.ghost,button.soft{background:var(--soft2);color:#c2185b;box-shadow:none}
+button.sm{padding:6px 12px;font-size:.82rem;border-radius:10px}
+button.full{width:100%;margin-top:14px}
+button[disabled]{opacity:.6;cursor:wait}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:560px){.grid.g4{grid-template-columns:repeat(4,1fr)}}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media(min-width:700px){.kpis{grid-template-columns:repeat(6,1fr)}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kpi,.stat{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 8px 22px rgba(80,0,40,.16)}
+.card .kpi{background:var(--soft);box-shadow:none}
+.kpi b,.stat b{display:block;font-size:1.3rem;line-height:1.25}
+.kpi span,.stat span{font-size:.76rem;color:var(--mute);font-weight:600}
+.meta{color:var(--mute);font-size:.86rem}
+.msg{margin:0 0 10px;font-weight:700;padding:10px 14px;border-radius:14px;background:#fff;color:var(--ink)}
+.msg.bad{background:#ffe9e7;color:var(--err)}.msg.good{background:var(--ok-bg);color:var(--ok)}
+.card .msg{padding:0;background:none}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:4px 0 10px}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff2d86,#ff9f1c,#ffd23f)}
+.steps{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 8px}
+.step{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--mute)}
+.step i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#ece3ee;color:var(--mute);font-style:normal;font-size:.9rem}
+.step.done{color:var(--ok)}.step.done i{background:var(--ok);color:#fff}
+.step.cur{color:var(--pink)}.step.cur i{background:var(--pink);color:#fff}
+.qr{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.qr svg,.qr img{width:130px;height:130px;background:#fff;padding:6px;border-radius:14px;border:2px solid var(--line)}
+.chart{display:flex;align-items:flex-end;gap:5px;height:120px;overflow-x:auto}
+.col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:34px;height:100%}
+.col div{display:flex;align-items:flex-end;gap:2px;height:100%}
+.col i{width:12px;border-radius:4px 4px 0 0;min-height:2px}
+.col small{font-size:.66rem;color:var(--mute)}
+.legend{font-size:.8rem;color:var(--mute);margin-top:6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.scroll{overflow:auto}
+.scroll.tall{max-height:320px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th{color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+td.n,th.n{text-align:right}
+.badge{display:inline-block;font-size:.78rem;font-weight:800;padding:2px 10px;border-radius:99px;background:var(--warn-bg);color:var(--warn)}
+.badge.ok,.badge.done{background:var(--ok-bg);color:var(--ok)}
+.caption{white-space:pre-wrap;background:var(--soft);border-radius:14px;padding:12px;margin:8px 0}
+ul.rules{margin:0;padding-left:20px}ul.rules li{margin:4px 0}
+.two{display:grid;gap:14px}@media(min-width:800px){.two{grid-template-columns:1fr 1fr}}
+.f4{display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}@media(min-width:700px){.f4{grid-template-columns:repeat(4,1fr) auto;align-items:end}}
+.res{border-top:1px solid var(--line);padding:12px 0}.res:first-child{border-top:0}
+.res h3{margin:0;font-size:1.05rem}
+.codebig{font-size:2rem;font-weight:800;letter-spacing:.12em;text-align:center;padding:12px;border-radius:16px;background:var(--navy);color:var(--gold);margin:8px 0}
+.prev{width:100%;max-height:240px;object-fit:contain;border-radius:14px;margin-top:8px;background:var(--soft)}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:700;margin-top:12px}
+.check input{margin-top:3px;flex:none}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:35;display:flex;gap:12px;justify-content:center;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(255,240,246,.97);box-shadow:0 -8px 30px rgba(80,0,40,.2)}
+.actionbar button{flex:1;max-width:340px;padding:14px}
+@media(min-width:900px){.actionbar{left:calc(var(--side-w) + 32px)}}
+[hidden]{display:none!important}
+</style>
+<link rel="icon" href="https://marketingexata.github.io/afiliatorjp/logojps.png">
+<style id="jpl-css">
+.brand-logo{height:40px;width:auto;max-width:132px;object-fit:contain;flex:none;border-radius:10px}
+.login-logo{display:block;height:54px;max-width:200px;object-fit:contain;margin:0 auto 14px}
+.top-logo{height:34px;width:auto;max-width:96px;object-fit:contain;background:#fff;padding:3px 6px;border-radius:10px;flex:none}
+@media(min-width:900px){.top-logo{display:none}}
+:root{--jpl2:#ff9f1c}
+.jpl{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(26,16,51,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s}
+.jpl.on{opacity:1;visibility:visible}
+.jpl-box{width:min(290px,100%);background:var(--card,#fff);color:var(--ink,#24112f);border-radius:26px;padding:28px 22px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.38)}
+.jpl-ring{position:relative;width:136px;height:136px;margin:0 auto 16px}
+.jpl-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.jpl-ring .tr{fill:none;stroke:var(--line,#f3d6e5);stroke-width:9}
+.jpl-ring .pg{fill:none;stroke:url(#jplg);stroke-width:9;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset .25s ease}
+.jpl-spin{position:absolute;inset:-7px;border-radius:50%;border:3px solid transparent;border-top-color:var(--acc,#f0156e);border-right-color:var(--jpl2,#ff9f1c);opacity:.6;animation:jpls 1.1s linear infinite}
+.jpl-logo{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;object-fit:contain}
+.jpl-pct{font-size:2rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.jpl-lb{font-weight:700;margin-top:4px}
+.jpl-sub{font-size:.84rem;color:var(--mute,#7b6687);min-height:1.3em;margin-top:2px}
+@keyframes jpls{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.jpl-spin{animation:none;opacity:0}.jpl,.jpl-ring .pg{transition:none}}
+</style>
+<script>
+var JP_LOGO='https://marketingexata.github.io/afiliatorjp/logojps.png',JP_LOGO_ALT='http://marketingexata.github.io/afiliatorjp/logojps.png';
+function jpLogoErr(i){if(!i.dataset.f){i.dataset.f='1';i.src=JP_LOGO_ALT;}else{i.style.visibility='hidden';}}
+var JPL=(function(){
+  var C=326.73,tasks=[],el=null,pgEl,pctEl,lbEl,subEl,tick=null,showT=null,shownAt=0,hideT=null;
+  var SUB={up:'Mengunggah data',wait:'Memproses di server',dl:'Mengunduh hasil'};
+  function isOn(){return !!el&&el.classList.contains('on');}
+  function build(){
+    if(el)return;
+    el=document.createElement('div');el.className='jpl';el.setAttribute('role','status');el.setAttribute('aria-live','polite');
+    el.innerHTML='<div class="jpl-box"><div class="jpl-ring"><i class="jpl-spin"></i>'+
+      '<svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="jplg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--acc,#f0156e)"/><stop offset="1" style="stop-color:var(--jpl2,#ff9f1c)"/></linearGradient></defs>'+
+      '<circle class="tr" cx="60" cy="60" r="52"/><circle class="pg" cx="60" cy="60" r="52"/></svg>'+
+      '<img class="jpl-logo" alt="" src="'+JP_LOGO+'" onerror="jpLogoErr(this)"></div>'+
+      '<div class="jpl-pct">0%</div><div class="jpl-lb">Memuat</div><div class="jpl-sub"></div></div>';
+    document.body.appendChild(el);
+    pgEl=el.querySelector('.pg');pctEl=el.querySelector('.jpl-pct');lbEl=el.querySelector('.jpl-lb');subEl=el.querySelector('.jpl-sub');
+  }
+  function paint(){
+    if(!isOn())return;
+    var sum=0;tasks.forEach(function(t){sum+=t.p;});
+    var pct=tasks.length?Math.min(100,Math.round(sum/tasks.length)):100,last=tasks[tasks.length-1];
+    pctEl.textContent=pct+'%';pgEl.style.strokeDashoffset=(C*(1-pct/100)).toFixed(1);
+    if(last){lbEl.textContent=last.label;subEl.textContent=last.sub||SUB[last.phase]||'';}
+  }
+  function show(){build();clearTimeout(hideT);el.classList.add('on');shownAt=Date.now();paint();}
+  function hide(){
+    if(!el)return;
+    var w=Math.max(0,350-(Date.now()-shownAt));
+    hideT=setTimeout(function(){if(!tasks.length)el.classList.remove('on');},w);
+  }
+  function step(){
+    for(var i=tasks.length-1;i>=0;i--){
+      var t=tasks[i],cap;
+      if(t.done){t.p=Math.min(100,t.p+Math.max(5,(100-t.p)*.4));if(t.p>=100)tasks.splice(i,1);continue;}
+      cap=t.phase==='up'?8+52*t.up:(t.phase==='wait'?90:90+9*t.dl);
+      if(t.p<cap)t.p=Math.min(cap,t.p+Math.max(.15,(cap-t.p)*.09));
+    }
+    paint();
+    if(!tasks.length){clearInterval(tick);tick=null;hide();}
+  }
+  function start(label,sub,phase){
+    var t={label:label||'Memuat',sub:sub||'',phase:phase||'wait',up:0,dl:0,p:0,done:false};
+    tasks.push(t);
+    if(!tick)tick=setInterval(step,60);
+    if(!isOn()&&!showT)showT=setTimeout(function(){showT=null;if(tasks.length)show();},150);
+    return {
+      set:function(ph,f){t.phase=ph;if(ph==='up')t.up=f||0;if(ph==='dl')t.dl=f||0;},
+      end:function(){
+        if(!isOn()){
+          var i=tasks.indexOf(t);if(i>=0)tasks.splice(i,1);
+          if(!tasks.length){clearTimeout(showT);showT=null;if(tick){clearInterval(tick);tick=null;}}
+          return;
+        }
+        t.done=true;
+      }
+    };
+  }
+  function xhr(url,opt,label){
+    opt=opt||{};
+    return new Promise(function(resolve,reject){
+      var post=!!opt.body,t=label===false?null:start(label||(post?'Mengirim data':'Memuat data'),'',post?'up':'wait');
+      var x=new XMLHttpRequest(),fin=false;
+      function done(){if(t&&!fin)t.end();fin=true;}
+      x.open(opt.method||(post?'POST':'GET'),url,true);
+      if(post)x.setRequestHeader('Content-Type','text/plain;charset=utf-8');
+      x.timeout=120000;
+      if(t){
+        x.upload.onprogress=function(e){if(e.lengthComputable)t.set('up',e.loaded/e.total);};
+        x.upload.onload=function(){t.set('wait');};
+        x.onprogress=function(e){t.set('dl',e.lengthComputable&&e.total?e.loaded/e.total:.5);};
+      }
+      x.onload=function(){
+        done();
+        var j;try{j=JSON.parse(x.responseText);}catch(e){return reject(new Error('Respons server tidak valid. Coba lagi.'));}
+        if(x.status>=400)return reject(new Error('Server bermasalah ('+x.status+').'));
+        resolve(j);
+      };
+      x.onerror=x.ontimeout=x.onabort=function(){done();reject(new Error('Koneksi bermasalah. Periksa internet lalu coba lagi.'));};
+      x.send(post?opt.body:null);
+    });
+  }
+  function work(label,sub,fn){
+    var t=start(label,sub,'wait');
+    return Promise.resolve().then(fn).then(function(v){t.end();return v;},function(e){t.end();throw e;});
+  }
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  return {start:start,xhr:xhr,work:work,sleep:sleep};
+})();
+</script>
+</head>
+<body>
+<main id="login" class="login"><section class="card logincard">
+<img class="login-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)">
+<span class="pill sm"><b>JP SMART SIM</b> Admin</span>
+<h1 style="margin-top:10px">Masuk admin</h1>
+<label for="pw">Kata sandi admin</label>
+<input id="pw" type="password" autocomplete="current-password">
+<p id="loginMsg" class="msg bad" role="alert" hidden></p>
+<button id="loginBtn" class="full">Masuk</button>
+</section></main>
+<div id="app" class="shell" hidden>
+<aside id="side" class="side" aria-label="Menu utama">
+<div class="side-head"><div class="brand"><img class="brand-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)"><div><b>JP SMART SIM</b><small>Panel admin</small></div></div><button id="closeSide" class="iconbtn closeside" aria-label="Tutup menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<nav class="nav" aria-label="Navigasi"><button data-view="afil" data-title="Afiliator"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg><span>Afiliator</span></button><button data-view="event" data-title="Event"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Event</span></button><button data-view="komisi" data-title="Komisi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Komisi</span></button><button data-view="antrean" data-title="Antrean"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><span>Antrean</span><span id="navAnt" class="cnt" hidden></span></button><button data-view="sistem" data-title="Sistem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><span>Sistem</span></button></nav>
+<div class="side-foot"><button id="refresh" class="ghost"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Muat ulang</button><button id="logout" class="ghost"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Keluar</button></div>
+</aside>
+<div id="scrim" class="scrim" hidden></div>
+<div class="main">
+<header class="top"><div class="top-t"><img class="top-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)"><h1 id="pageTitle">Afiliator</h1><span id="phase" class="pill sm"></span></div><button id="burger" class="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="side"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></header>
+<div class="content">
+<p id="msg" class="msg" role="status" hidden></p>
+<div class="kpis" id="kpis"></div>
+<div id="alerts"></div>
+<div id="t-afil" data-view-pane="afil" hidden></div><div id="t-event" data-view-pane="event" hidden></div>
+<div id="t-komisi" data-view-pane="komisi" hidden></div><div id="t-antrean" data-view-pane="antrean" hidden></div>
+<div id="t-sistem" data-view-pane="sistem" hidden></div>
+</div>
+</div>
+</div>
+<script>
+const Shell = (() => {
+  const g = id => document.getElementById(id);
+  const side = g('side'), scrim = g('scrim'), burger = g('burger');
+  const mq = window.matchMedia('(max-width: 899px)');
+  let onChange = null;
+  const sync = () => { side.inert = mq.matches && !side.classList.contains('open'); };
+  function open(o) {
+    side.classList.toggle('open', o); scrim.hidden = !o;
+    burger.setAttribute('aria-expanded', String(o)); burger.setAttribute('aria-label', o ? 'Tutup menu' : 'Buka menu');
+    document.body.classList.toggle('lock', o); sync();
+    if (o) { const f = side.querySelector('[aria-current=page]') || side.querySelector('.nav button'); if (f) f.focus(); }
+    else if (mq.matches) burger.focus();
+  }
+  burger.addEventListener('click', () => open(!side.classList.contains('open')));
+  g('closeSide').addEventListener('click', () => open(false));
+  scrim.addEventListener('click', () => open(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) open(false); });
+  mq.addEventListener('change', () => { if (!mq.matches && side.classList.contains('open')) open(false); sync(); });
+  function go(name, scroll) {
+    document.querySelectorAll('.nav button[data-view]').forEach(b => {
+      const on = b.dataset.view === name;
+      if (on) { b.setAttribute('aria-current', 'page'); g('pageTitle').textContent = b.dataset.title; } else b.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('[data-view-pane]').forEach(p => { p.hidden = p.dataset.viewPane !== name; });
+    if (scroll !== false) window.scrollTo(0, 0);
+    if (onChange) onChange(name);
+  }
+  document.querySelector('.nav').addEventListener('click', e => {
+    const b = e.target.closest('button[data-view]'); if (!b) return;
+    go(b.dataset.view); if (mq.matches) open(false);
+  });
+  sync();
+  return { go, open, onChange: fn => { onChange = fn; } };
+})();
+</script>
+<script>
+// ===== GANTI dengan URL Web App Apps Script (berakhiran /exec) =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbwQ115XVOEhwNOC05oTR1VnxRn-gyVgfbrBgZ4d4YsKGWoifrnU7-L8Y2bUadGOVrWBzw/exec';
+// ===================================================================
+const $ = id => document.getElementById(id);
+const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
+let TOKEN = '', D = null, TAB = '';
+try { TOKEN = sessionStorage.getItem('ad') || ''; } catch (e) {}
+
+const LBL = { adm_data: 'Memuat dashboard', adm_afiliator_set: 'Menyimpan data afiliator', adm_afiliator_baru: 'Menambah afiliator',
+  adm_bayar_konfirmasi: 'Mengonfirmasi pembayaran', adm_konversi: 'Mengalihkan pendaftar', adm_komisi_bayar: 'Mencatat pembayaran komisi' };
+function post(body, label) { return JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify(body) }, label); }
+async function call(action, extra, label) {
+  const r = await post(Object.assign({ action, token: TOKEN }, extra || {}), label === false ? false : (label || LBL[action]));
+  if (r.auth) logout();
+  return r;
+}
+function logout() { TOKEN = ''; try { sessionStorage.removeItem('ad'); } catch (e) {} $('app').hidden = true; $('login').hidden = false; }
+function say(t, kind) { const m = $('msg'); m.textContent = t; m.className = 'msg ' + (kind || ''); m.hidden = !t; if (t) window.scrollTo(0, 0); }
+
+$('loginBtn').onclick = async () => {
+  const m = $('loginMsg'); m.hidden = true; $('loginBtn').disabled = true;
+  try {
+    const r = await post({ action: 'adm_login', pw: $('pw').value }, 'Memeriksa kata sandi');
+    if (!r.ok) throw new Error(r.error);
+    TOKEN = r.token; $('pw').value = '';
+    try { sessionStorage.setItem('ad', TOKEN); } catch (e) {}
+    start();
+  } catch (e) { m.textContent = e.message || 'Gagal masuk. Periksa koneksi.'; m.hidden = false; }
+  $('loginBtn').disabled = false;
+};
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+$('logout').onclick = logout;
+$('refresh').onclick = () => load(true);
+
+async function start() { $('login').hidden = true; $('app').hidden = false; TAB = ''; await load(); }
+async function load(keepMsg, silent) {
+  if (!keepMsg) say('');
+  try { const r = await call('adm_data', null, silent === true ? false : undefined); if (r.ok) { D = r; render(); } else say(r.error, 'bad'); }
+  catch (e) { say('Gagal memuat data. Periksa koneksi.', 'bad'); }
+}
+
+function chart(el, items) {
+  const mx = Math.max(1, ...items.map(i => Math.max(i.a, i.b || 0)));
+  el.innerHTML = items.length ? items.map(i => '<div class="col"><div><i style="height:' + Math.round(100 * i.a / mx) + '%;background:var(--acc)" title="' + i.a + '"></i>' +
+    (i.b == null ? '' : '<i style="height:' + Math.round(100 * i.b / mx) + '%;background:var(--bar2)" title="' + i.b + '"></i>') + '</div><small>' + esc(i.l) + '</small></div>').join('')
+    : '<p class="meta">Belum ada data.</p>';
+}
+const tbl = (head, rows, empty) => '<div class="scroll"><table><thead><tr>' + head.map(h => '<th' + (h[1] ? ' class="n"' : '') + '>' + esc(h[0]) + '</th>').join('') + '</tr></thead><tbody>' +
+  (rows.length ? rows.join('') : '<tr><td colspan="' + head.length + '" class="meta">' + esc(empty) + '</td></tr>') + '</tbody></table></div>';
+
+function render() {
+  const k = D.kpi;
+  $('phase').innerHTML = 'Fase: <b>' + { SEBELUM: 'sebelum event', EVENT: 'event berlangsung', SESUDAH: 'setelah event' }[D.fase] + '</b>';
+  $('kpis').innerHTML = [
+    [k.diambil + '/' + k.plafon, 'Diambil / plafon'], [k.hari_ini, 'Diambil hari ini'], [k.belum_ambil + ' (' + k.belum_pct + '%)', 'Belum datang'],
+    [k.stok_sisa, 'Stok kartu sisa'], [rp(k.komisi_total), 'Komisi terutang'], [rp(k.sisa_bayar), 'Sisa dibayar'],
+  ].map(x => '<div class="kpi"><b>' + esc(x[0]) + '</b><span>' + x[1] + '</span></div>').join('');
+  const al = [];
+  if (k.stok_sisa <= 30) al.push('Stok kartu tinggal ' + k.stok_sisa + '.');
+  if (k.diambil >= k.plafon) al.push('Plafon komisi ' + k.plafon + ' tercapai. Pengambilan berikutnya tidak dikomisi.');
+  if (D.kritis.length) al.push(D.kritis.length + ' kode berisiko kehabisan kartu (lihat tab Antrean).');
+  if (D.antrean_bayar.length) al.push(D.antrean_bayar.length + ' pembayaran menunggu verifikasi.');
+  if (D.bisa_konversi) al.push(D.tak_hadir + ' pendaftar gratis tidak datang dan bisa dialihkan ke jalur berbayar.');
+  $('alerts').innerHTML = al.map(t => '<div class="note">' + esc(t) + '</div>').join('');
+  const nAnt = D.antrean_bayar.length + D.kritis.length + (D.bisa_konversi ? 1 : 0); $('navAnt').textContent = nAnt; $('navAnt').hidden = !nAnt;
+  renderAfil(); renderEvent(); renderKomisi(); renderAntrean(); renderSistem();
+  if (!TAB) setTab({ SEBELUM: 'afil', EVENT: 'event', SESUDAH: 'komisi' }[D.fase], true); else setTab(TAB, false);
+}
+
+function setTab(t, scroll) { TAB = t; Shell.go(t, scroll); }
+Shell.onChange(t => { TAB = t; });
+
+function renderAfil() {
+  const f = D.funnel, tot = Math.max(1, f.total);
+  const bars = f.stages.map((s, i) => '<div>' + esc(s) + ': <b>' + f.kum[i] + '</b> <span class="meta">(dari ' + f.total + ' afiliator, kumulatif)</span></div><div class="bar"><i style="width:' + Math.round(100 * f.kum[i] / tot) + '%"></i></div>').join('');
+  const zoom = D.zoom.length ? D.zoom.map(z => esc(z.tgl) + ': ' + z.n + '/10' + (z.n > 10 ? ' (melebihi kapasitas)' : '')).join('<br>') : 'Belum ada jadwal Zoom tercatat.';
+  const stOpt = (cur) => ['', ...f.stages, 'Menolak'].map(s => '<option value="' + esc(s) + '"' + (s === cur ? ' selected' : '') + '>' + esc(s || 'Belum dihubungi') + '</option>').join('');
+  const rows = D.afiliator.map(a => '<tr data-kode="' + esc(a.kode) + '"><td><b>' + esc(a.kode) + '</b></td><td>' + esc(a.nama) + '</td><td>' + esc(a.jalur) + '</td>' +
+    '<td><select data-f="funnel">' + stOpt(a.funnel) + '</select></td><td><input data-f="zoom" type="date" value="' + esc(a.sesi_zoom) + '"></td>' +
+    '<td><input data-f="kartu" type="number" min="0" max="1000" value="' + a.kartu_dicetak + '" style="width:80px"></td>' +
+    '<td><input data-f="aktif" type="checkbox"' + (a.aktif ? ' checked' : '') + '></td><td>' + (a.pin_ada ? 'ada' : '<span class="meta">belum</span>') + '</td><td class="n">' + a.konten + '</td>' +
+    '<td><button class="sm" data-act="simpan">Simpan</button></td></tr>');
+  $('t-afil').innerHTML = '<div class="two"><div class="card"><h2>Funnel rekrutmen</h2>' + bars +
+    '<p class="meta">Menolak: ' + f.menolak + '. Belum dihubungi: ' + f.belum + '.</p></div>' +
+    '<div class="card"><h2>Sesi Zoom (maks. 10 per hari)</h2><p>' + zoom + '</p>' +
+    '<h2 style="margin-top:14px">Tambah afiliator</h2><div class="f4"><div><label for="nKode">Kode</label><input id="nKode" maxlength="20"></div><div><label for="nNama">Nama</label><input id="nNama"></div>' +
+    '<div><label for="nAkun">Akun</label><input id="nAkun"></div><div><label for="nJalur">Jalur</label><select id="nJalur"><option value="mandiri">mandiri</option><option value="tambahan">tambahan</option></select></div><button id="nBtn">Tambah</button></div>' +
+    '<p class="meta">Afiliator baru nonaktif sampai Anda mencentang Aktif. PIN dibuat lewat menu JP SMART SIM di Google Sheet.</p></div></div>' +
+    '<div class="card"><h2>Daftar afiliator</h2>' + tbl([['Kode'], ['Nama'], ['Jalur'], ['Status'], ['Zoom'], ['Kartu dicetak'], ['Aktif'], ['PIN'], ['Konten', 1], ['']], rows, 'Belum ada afiliator.') + '</div>';
+}
+
+function renderEvent() {
+  const k = D.kpi;
+  const stat = '<p>Belum datang: <b>' + k.belum_pct + '%</b> dari pendaftar gratis. Pengambilan organik (tanpa kode): <b>' + k.organik + '</b>. Tiga afiliator teratas menyumbang <b>' + D.top3_pct + '%</b> pengambilan afiliator.</p>';
+  const kr = D.kritis.length ? D.kritis.map(x => '<div class="note">' + esc(x.kode) + ' (' + esc(x.nama) + '): ' + x.belum + ' pendaftar belum datang, sisa kartu ' + x.kartu_sisa + '.</div>').join('') : '<p class="meta">Tidak ada kode yang berisiko kehabisan kartu (hanya dicek untuk kode yang jumlah kartunya diisi).</p>';
+  const pick = D.pickups.map(p => '<tr><td>' + esc(p.t.slice(5, 16)) + '</td><td>' + esc(p.nama) + '</td><td>' + esc(p.kode) + '</td><td>' + esc(p.staf) + '</td><td>' + (p.foto ? '<a href="' + esc(p.foto) + '" target="_blank" rel="noopener">Lihat foto</a>' : '<span class="meta">tidak ada</span>') + '</td></tr>');
+  const pf = D.prefektur.map(p => '<tr><td>' + esc(p.nama) + '</td><td class="n">' + p.daftar + '</td><td class="n">' + p.ambil + '</td></tr>');
+  $('t-event').innerHTML = '<div class="card"><h2>Operasional event</h2>' + stat + kr + '</div>' +
+    '<div class="two"><div class="card"><h2>Per hari (biru: daftar, kuning: ambil)</h2><div id="cHari" class="chart"></div></div><div class="card"><h2>Pengambilan per jam</h2><div id="cJam" class="chart"></div></div></div>' +
+    '<div class="two"><div class="card"><h2>Asal penerima</h2>' + tbl([['Wilayah'], ['Daftar', 1], ['Ambil', 1]], pf, 'Belum ada data.') + '</div>' +
+    '<div class="card"><h2>Serah terima terbaru (bukti foto)</h2>' + tbl([['Waktu'], ['Nama'], ['Kode'], ['Staf'], ['Bukti']], pick, 'Belum ada serah terima.') + '</div></div>';
+  chart($('cHari'), D.tren.map(t => ({ l: t.tgl.slice(5).replace('-', '/'), a: t.daftar, b: t.ambil })));
+  chart($('cJam'), D.per_jam.map(j => ({ l: j.k.slice(8, 10) + '/' + j.k.slice(11) + 'h', a: j.n })));
+}
+
+function renderKomisi() {
+  const k = D.kpi;
+  const rows = D.afiliator.map(a => '<tr><td><b>' + esc(a.kode) + '</b></td><td>' + esc(a.nama) + '</td><td>' + (a.rekening ? esc(a.rekening) : '<span class="meta">belum diisi</span>') + '</td>' +
+    '<td class="n">' + a.valid + '</td><td class="n">' + a.luar + '</td><td class="n">' + a.b_lunas + '</td><td class="n">' + rp(a.total) + '</td><td class="n">' + rp(a.dibayar) + '</td><td class="n"><b>' + rp(a.sisa) + '</b></td>' +
+    '<td>' + (a.sisa > 0 ? '<button class="sm" data-act="bayar" data-kode="' + esc(a.kode) + '" data-sisa="' + a.sisa + '">Tandai dibayar</button>' : '') + '</td></tr>');
+  $('t-komisi').innerHTML = '<div class="card"><h2>Komisi</h2><p>Terutang <b>' + rp(k.komisi_total) + '</b>, dibayar <b>' + rp(k.dibayar) + '</b>, sisa <b>' + rp(k.sisa_bayar) + '</b>. Anggaran maksimal jalur gratis (plafon x komisi): ' + rp(k.anggaran_gratis_max) + '.</p>' +
+    '<button id="csv" class="ghost">Ekspor CSV</button></div><div class="card">' +
+    tbl([['Kode'], ['Nama'], ['Rekening'], ['Gratis valid', 1], ['Di luar plafon', 1], ['Berbayar lunas', 1], ['Total', 1], ['Dibayar', 1], ['Sisa', 1], ['']], rows, 'Belum ada afiliator.') +
+    '<p class="meta">Tombol pembayaran mencatat transfer yang sudah Anda lakukan. Nominal tidak boleh melebihi sisa.</p></div>';
+}
+
+function renderAntrean() {
+  const by = D.antrean_bayar.map(p => '<tr><td>' + esc(p.id) + '</td><td>' + esc(p.nama) + '</td><td>' + esc(p.wa) + '</td><td>' + esc(p.kode) + '</td><td>' + esc(p.t.slice(5, 16)) + '</td><td><button class="sm" data-act="lunas" data-id="' + esc(p.id) + '">Konfirmasi lunas</button></td></tr>');
+  const lg = D.log.map(l => '<tr><td>' + esc(l.t.slice(5, 16)) + '</td><td>' + esc(l.aktor) + '</td><td>' + esc(l.aksi) + '</td><td>' + esc(l.detail) + '</td></tr>');
+  const kr = D.kritis.map(x => '<tr><td>' + esc(x.kode) + '</td><td>' + esc(x.nama) + '</td><td class="n">' + x.belum + '</td><td class="n">' + x.kartu_sisa + '</td></tr>');
+  $('t-antrean').innerHTML = '<div class="card"><h2>Pembayaran ¥3.300 menunggu verifikasi</h2>' + tbl([['Tiket'], ['Nama'], ['WhatsApp'], ['Kode'], ['Daftar'], ['']], by, 'Tidak ada antrean.') + '</div>' +
+    '<div class="card"><h2>Pendaftar gratis yang tidak datang</h2><p>' + D.tak_hadir + ' pendaftar belum mengambil kartu.' + (D.bisa_konversi ? '' : ' Pengalihan baru bisa dilakukan setelah event berakhir.') + '</p>' +
+    '<button id="konv"' + (D.bisa_konversi ? '' : ' disabled') + '>Alihkan ke jalur berbayar</button><p class="meta">Status mereka menjadi "Menunggu bayar". Hubungi lewat WhatsApp dengan instruksi pembayaran.</p></div>' +
+    '<div class="card"><h2>Kode berisiko kehabisan kartu</h2>' + tbl([['Kode'], ['Nama'], ['Belum datang', 1], ['Sisa kartu', 1]], kr, 'Aman.') + '</div>' +
+    '<div class="card"><h2>Log audit (30 terakhir)</h2>' + tbl([['Waktu'], ['Aktor'], ['Aksi'], ['Detail']], lg, 'Kosong.') + '</div>';
+}
+
+function renderSistem() {
+  const rows = Object.keys(D.param).map(k => '<tr><td>' + esc(k) + '</td><td>' + esc(D.param[k]) + '</td></tr>');
+  $('t-sistem').innerHTML = '<div class="card"><h2>Parameter (hanya baca)</h2>' + tbl([['Kunci'], ['Nilai']], rows, '-') +
+    '<p class="meta">Ubah nilai di sheet Pengaturan. Perubahan berlaku pada muat ulang berikutnya. PIN booth, hash admin, dan folder bukti tidak ditampilkan.</p></div>';
+}
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button[data-act],#nBtn,#konv,#csv'); if (!b) return;
+  const act = b.dataset.act || b.id;
+  async function run(fn, ok) {
+    b.disabled = true;
+    try { const r = await fn(); if (!r.ok) say(r.error, 'bad'); else { say(ok(r), 'good'); await load(true, true); } }
+    catch (err) { say('Koneksi bermasalah. Muat ulang untuk memeriksa status sebelum mengulang.', 'bad'); }
+    b.disabled = false;
+  }
+  if (act === 'simpan') {
+    const tr = b.closest('tr'), g = f => tr.querySelector('[data-f=' + f + ']');
+    return run(() => call('adm_afiliator_set', { kode: tr.dataset.kode, funnel: g('funnel').value, sesi_zoom: g('zoom').value, kartu_dicetak: g('kartu').value, aktif: g('aktif').checked }), () => 'Tersimpan: ' + tr.dataset.kode + '.');
+  }
+  if (act === 'nBtn') return run(() => call('adm_afiliator_baru', { kode: $('nKode').value, nama: $('nNama').value, akun: $('nAkun').value, jalur: $('nJalur').value }), () => 'Afiliator ditambahkan (nonaktif). Centang Aktif setelah siap.');
+  if (act === 'lunas') {
+    const cat = prompt('Catatan bukti pembayaran (opsional):'); if (cat === null) return;
+    return run(() => call('adm_bayar_konfirmasi', { id: b.dataset.id, catatan: cat }), () => 'Pembayaran ' + b.dataset.id + ' dikonfirmasi.');
+  }
+  if (act === 'konv') {
+    if (!confirm('Alihkan ' + D.tak_hadir + ' pendaftar tak hadir ke jalur berbayar?')) return;
+    return run(() => call('adm_konversi'), r => r.jumlah + ' pendaftar dialihkan ke jalur berbayar.');
+  }
+  if (act === 'bayar') {
+    const nom = prompt('Nominal yang sudah ditransfer untuk ' + b.dataset.kode + ' (maks. sisa):', b.dataset.sisa); if (nom === null) return;
+    const cat = prompt('Catatan (opsional, misal tanggal transfer):'); if (cat === null) return;
+    return run(() => call('adm_komisi_bayar', { kode: b.dataset.kode, nominal: nom, catatan: cat }), () => 'Pembayaran ' + b.dataset.kode + ' dicatat.');
+  }
+  if (act === 'csv') {
+    await JPL.work('Mengunduh CSV', 'Menyusun data komisi', () => JPL.sleep(700));
+    const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const lines = [['kode', 'nama', 'rekening', 'gratis_valid', 'di_luar_plafon', 'berbayar_lunas', 'total', 'dibayar', 'sisa']].concat(
+      D.afiliator.map(a => [a.kode, a.nama, a.rekening, a.valid, a.luar, a.b_lunas, a.total, a.dibayar, a.sisa]));
+    const url = URL.createObjectURL(new Blob(['\ufeff' + lines.map(r => r.map(q).join(',')).join('\n')], { type: 'text/csv' }));
+    const a = document.createElement('a'); a.href = url; a.download = 'komisi-' + D.today + '.csv'; a.click(); URL.revokeObjectURL(url);
+  }
+});
+
+if (TOKEN) start();
+</script>
+</body>
+</html>

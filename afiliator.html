@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff1d7c">
+<meta name="robots" content="noindex">
+<title>Dashboard Afiliator JP SMART SIM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#f0156e;--acc:#f0156e;--crimson:#d4005a;--ink:#24112f;--mute:#7b6687;--line:#f3d6e5;--soft:#fff0f6;--soft2:#ffe0ee;--ok:#1f9d63;--ok-bg:#e3f6ec;--warn:#8a3d00;--warn-bg:#fff3e0;--err:#d92d20;--bar2:#ff9f1c;--navy:#1a1033;--gold:#ffe600;--grad:linear-gradient(135deg,#ff2d86,#d4005a);--side-w:264px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;color:var(--ink);font:15px/1.55 "Plus Jakarta Sans","Avenir Next","Segoe UI",system-ui,sans-serif;background:#c2005a}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,#ff1d7c 0%,#ff4f9a 48%,#c2005a 100%)}
+body.lock{overflow:hidden}
+body.has-bar .content{padding-bottom:120px}
+h1{font-size:1.35rem;line-height:1.25;margin:0}
+h2{font-size:1.05rem;margin:0 0 10px}
+.ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* ---- shell: sidebar desktop, drawer kanan di HP ---- */
+.side{position:fixed;z-index:50;top:0;bottom:0;right:0;width:min(84vw,320px);background:#fff;border-radius:24px 0 0 24px;box-shadow:-12px 0 40px rgba(60,0,30,.35);transform:translateX(100%);transition:transform .28s ease;display:flex;flex-direction:column;padding:18px 14px;padding-top:max(18px,env(safe-area-inset-top));padding-bottom:max(18px,env(safe-area-inset-bottom));overflow-y:auto}
+.side.open{transform:none}
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(40,0,25,.55)}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{display:block;line-height:1.2}
+.brand small{color:var(--mute);font-weight:600}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:0 8px 18px rgba(212,0,90,.3)}
+.who{margin-top:14px;padding:10px 12px;border-radius:14px;background:var(--soft)}
+.who b{display:block;overflow-wrap:anywhere}
+.who span{color:var(--mute);font-size:.84rem}
+.nav{display:flex;flex-direction:column;gap:4px;margin:14px 0}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;background:transparent;color:var(--ink);font-weight:700;box-shadow:none}
+.nav button:hover{background:var(--soft)}
+.nav button[aria-current=page]{background:var(--grad);color:#fff;box-shadow:0 8px 18px rgba(212,0,90,.28)}
+.cnt{margin-left:auto;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--gold);color:var(--navy);font-size:.75rem;font-weight:800;display:grid;place-items:center}
+.side-foot{margin-top:auto;display:grid;gap:8px}
+.side-foot button{display:flex;align-items:center;justify-content:center;gap:8px}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));background:rgba(200,0,90,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;border-bottom:1px solid rgba(255,255,255,.2)}
+.top-t{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.iconbtn,.burger{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:14px;flex:none}
+.burger{background:rgba(255,255,255,.2);box-shadow:none;border:1px solid rgba(255,255,255,.35)}
+.iconbtn{background:var(--soft2);color:#c2185b;box-shadow:none}
+.content{padding:14px 14px 48px;max-width:1040px;margin:0 auto}
+@media(min-width:900px){
+ .side{transform:none;right:auto;left:16px;top:16px;bottom:16px;width:var(--side-w);border-radius:24px;box-shadow:0 18px 50px rgba(60,0,30,.3);z-index:20}
+ .main{margin-left:calc(var(--side-w) + 32px)}
+ .burger,.closeside{display:none}
+ .scrim{display:none!important}
+ .top{padding:16px 24px}
+ .content{padding:12px 24px 56px}
+}
+@media(prefers-reduced-motion:reduce){.side{transition:none}}
+/* ---- komponen ---- */
+.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px rgba(80,0,40,.18)}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.logincard{width:100%;max-width:420px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-radius:99px;padding:8px 16px;font-weight:700}
+.pill b{color:var(--gold)}
+.pill.sm{padding:4px 12px;font-size:.82rem}
+.banner{border-radius:18px;padding:12px 16px;margin-bottom:12px;background:var(--navy);color:#fff;font-weight:600}
+.banner b{color:var(--gold)}
+.banner.paid,.banner.info{background:var(--warn-bg);color:var(--warn);border-left:5px solid var(--bar2)}
+.note{border-radius:14px;padding:10px 14px;margin-bottom:8px;background:var(--warn-bg);color:var(--warn);font-weight:600}
+.note.ok{background:var(--ok-bg);color:var(--ok)}
+label{display:block;font-weight:700;margin:12px 0 4px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:14px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 4px rgba(240,21,110,.16)}
+input[readonly]{background:var(--soft)}
+td input,td select{padding:6px 8px;min-width:70px;border-radius:10px}
+input[type=checkbox]{width:20px;height:20px;padding:0;accent-color:var(--pink)}
+button{font:inherit;font-weight:800;padding:12px 18px;border:0;border-radius:14px;cursor:pointer;color:#fff;background:var(--grad);box-shadow:0 8px 18px rgba(212,0,90,.25)}
+button.ghost,button.soft{background:var(--soft2);color:#c2185b;box-shadow:none}
+button.sm{padding:6px 12px;font-size:.82rem;border-radius:10px}
+button.full{width:100%;margin-top:14px}
+button[disabled]{opacity:.6;cursor:wait}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:560px){.grid.g4{grid-template-columns:repeat(4,1fr)}}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media(min-width:700px){.kpis{grid-template-columns:repeat(6,1fr)}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kpi,.stat{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 8px 22px rgba(80,0,40,.16)}
+.card .kpi{background:var(--soft);box-shadow:none}
+.kpi b,.stat b{display:block;font-size:1.3rem;line-height:1.25}
+.kpi span,.stat span{font-size:.76rem;color:var(--mute);font-weight:600}
+.meta{color:var(--mute);font-size:.86rem}
+.msg{margin:0 0 10px;font-weight:700;padding:10px 14px;border-radius:14px;background:#fff;color:var(--ink)}
+.msg.bad{background:#ffe9e7;color:var(--err)}.msg.good{background:var(--ok-bg);color:var(--ok)}
+.card .msg{padding:0;background:none}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:4px 0 10px}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff2d86,#ff9f1c,#ffd23f)}
+.steps{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 8px}
+.step{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--mute)}
+.step i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#ece3ee;color:var(--mute);font-style:normal;font-size:.9rem}
+.step.done{color:var(--ok)}.step.done i{background:var(--ok);color:#fff}
+.step.cur{color:var(--pink)}.step.cur i{background:var(--pink);color:#fff}
+.qr{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.qr svg,.qr img{width:130px;height:130px;background:#fff;padding:6px;border-radius:14px;border:2px solid var(--line)}
+.chart{display:flex;align-items:flex-end;gap:5px;height:120px;overflow-x:auto}
+.col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:34px;height:100%}
+.col div{display:flex;align-items:flex-end;gap:2px;height:100%}
+.col i{width:12px;border-radius:4px 4px 0 0;min-height:2px}
+.col small{font-size:.66rem;color:var(--mute)}
+.legend{font-size:.8rem;color:var(--mute);margin-top:6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.scroll{overflow:auto}
+.scroll.tall{max-height:320px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th{color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+td.n,th.n{text-align:right}
+.badge{display:inline-block;font-size:.78rem;font-weight:800;padding:2px 10px;border-radius:99px;background:var(--warn-bg);color:var(--warn)}
+.badge.ok,.badge.done{background:var(--ok-bg);color:var(--ok)}
+.caption{white-space:pre-wrap;background:var(--soft);border-radius:14px;padding:12px;margin:8px 0}
+ul.rules{margin:0;padding-left:20px}ul.rules li{margin:4px 0}
+.two{display:grid;gap:14px}@media(min-width:800px){.two{grid-template-columns:1fr 1fr}}
+.f4{display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}@media(min-width:700px){.f4{grid-template-columns:repeat(4,1fr) auto;align-items:end}}
+.res{border-top:1px solid var(--line);padding:12px 0}.res:first-child{border-top:0}
+.res h3{margin:0;font-size:1.05rem}
+.codebig{font-size:2rem;font-weight:800;letter-spacing:.12em;text-align:center;padding:12px;border-radius:16px;background:var(--navy);color:var(--gold);margin:8px 0}
+.prev{width:100%;max-height:240px;object-fit:contain;border-radius:14px;margin-top:8px;background:var(--soft)}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:700;margin-top:12px}
+.check input{margin-top:3px;flex:none}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:35;display:flex;gap:12px;justify-content:center;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(255,240,246,.97);box-shadow:0 -8px 30px rgba(80,0,40,.2)}
+.actionbar button{flex:1;max-width:340px;padding:14px}
+@media(min-width:900px){.actionbar{left:calc(var(--side-w) + 32px)}}
+[hidden]{display:none!important}
+</style>
+<link rel="icon" href="https://marketingexata.github.io/afiliatorjp/logojps.png">
+<style id="jpl-css">
+.brand-logo{height:40px;width:auto;max-width:132px;object-fit:contain;flex:none;border-radius:10px}
+.login-logo{display:block;height:54px;max-width:200px;object-fit:contain;margin:0 auto 14px}
+.top-logo{height:34px;width:auto;max-width:96px;object-fit:contain;background:#fff;padding:3px 6px;border-radius:10px;flex:none}
+@media(min-width:900px){.top-logo{display:none}}
+:root{--jpl2:#ff9f1c}
+.jpl{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(26,16,51,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s}
+.jpl.on{opacity:1;visibility:visible}
+.jpl-box{width:min(290px,100%);background:var(--card,#fff);color:var(--ink,#24112f);border-radius:26px;padding:28px 22px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.38)}
+.jpl-ring{position:relative;width:136px;height:136px;margin:0 auto 16px}
+.jpl-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.jpl-ring .tr{fill:none;stroke:var(--line,#f3d6e5);stroke-width:9}
+.jpl-ring .pg{fill:none;stroke:url(#jplg);stroke-width:9;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset .25s ease}
+.jpl-spin{position:absolute;inset:-7px;border-radius:50%;border:3px solid transparent;border-top-color:var(--acc,#f0156e);border-right-color:var(--jpl2,#ff9f1c);opacity:.6;animation:jpls 1.1s linear infinite}
+.jpl-logo{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;object-fit:contain}
+.jpl-pct{font-size:2rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.jpl-lb{font-weight:700;margin-top:4px}
+.jpl-sub{font-size:.84rem;color:var(--mute,#7b6687);min-height:1.3em;margin-top:2px}
+@keyframes jpls{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.jpl-spin{animation:none;opacity:0}.jpl,.jpl-ring .pg{transition:none}}
+</style>
+<script>
+var JP_LOGO='https://marketingexata.github.io/afiliatorjp/logojps.png',JP_LOGO_ALT='http://marketingexata.github.io/afiliatorjp/logojps.png';
+function jpLogoErr(i){if(!i.dataset.f){i.dataset.f='1';i.src=JP_LOGO_ALT;}else{i.style.visibility='hidden';}}
+var JPL=(function(){
+  var C=326.73,tasks=[],el=null,pgEl,pctEl,lbEl,subEl,tick=null,showT=null,shownAt=0,hideT=null;
+  var SUB={up:'Mengunggah data',wait:'Memproses di server',dl:'Mengunduh hasil'};
+  function isOn(){return !!el&&el.classList.contains('on');}
+  function build(){
+    if(el)return;
+    el=document.createElement('div');el.className='jpl';el.setAttribute('role','status');el.setAttribute('aria-live','polite');
+    el.innerHTML='<div class="jpl-box"><div class="jpl-ring"><i class="jpl-spin"></i>'+
+      '<svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="jplg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--acc,#f0156e)"/><stop offset="1" style="stop-color:var(--jpl2,#ff9f1c)"/></linearGradient></defs>'+
+      '<circle class="tr" cx="60" cy="60" r="52"/><circle class="pg" cx="60" cy="60" r="52"/></svg>'+
+      '<img class="jpl-logo" alt="" src="'+JP_LOGO+'" onerror="jpLogoErr(this)"></div>'+
+      '<div class="jpl-pct">0%</div><div class="jpl-lb">Memuat</div><div class="jpl-sub"></div></div>';
+    document.body.appendChild(el);
+    pgEl=el.querySelector('.pg');pctEl=el.querySelector('.jpl-pct');lbEl=el.querySelector('.jpl-lb');subEl=el.querySelector('.jpl-sub');
+  }
+  function paint(){
+    if(!isOn())return;
+    var sum=0;tasks.forEach(function(t){sum+=t.p;});
+    var pct=tasks.length?Math.min(100,Math.round(sum/tasks.length)):100,last=tasks[tasks.length-1];
+    pctEl.textContent=pct+'%';pgEl.style.strokeDashoffset=(C*(1-pct/100)).toFixed(1);
+    if(last){lbEl.textContent=last.label;subEl.textContent=last.sub||SUB[last.phase]||'';}
+  }
+  function show(){build();clearTimeout(hideT);el.classList.add('on');shownAt=Date.now();paint();}
+  function hide(){
+    if(!el)return;
+    var w=Math.max(0,350-(Date.now()-shownAt));
+    hideT=setTimeout(function(){if(!tasks.length)el.classList.remove('on');},w);
+  }
+  function step(){
+    for(var i=tasks.length-1;i>=0;i--){
+      var t=tasks[i],cap;
+      if(t.done){t.p=Math.min(100,t.p+Math.max(5,(100-t.p)*.4));if(t.p>=100)tasks.splice(i,1);continue;}
+      cap=t.phase==='up'?8+52*t.up:(t.phase==='wait'?90:90+9*t.dl);
+      if(t.p<cap)t.p=Math.min(cap,t.p+Math.max(.15,(cap-t.p)*.09));
+    }
+    paint();
+    if(!tasks.length){clearInterval(tick);tick=null;hide();}
+  }
+  function start(label,sub,phase){
+    var t={label:label||'Memuat',sub:sub||'',phase:phase||'wait',up:0,dl:0,p:0,done:false};
+    tasks.push(t);
+    if(!tick)tick=setInterval(step,60);
+    if(!isOn()&&!showT)showT=setTimeout(function(){showT=null;if(tasks.length)show();},150);
+    return {
+      set:function(ph,f){t.phase=ph;if(ph==='up')t.up=f||0;if(ph==='dl')t.dl=f||0;},
+      end:function(){
+        if(!isOn()){
+          var i=tasks.indexOf(t);if(i>=0)tasks.splice(i,1);
+          if(!tasks.length){clearTimeout(showT);showT=null;if(tick){clearInterval(tick);tick=null;}}
+          return;
+        }
+        t.done=true;
+      }
+    };
+  }
+  function xhr(url,opt,label){
+    opt=opt||{};
+    return new Promise(function(resolve,reject){
+      var post=!!opt.body,t=label===false?null:start(label||(post?'Mengirim data':'Memuat data'),'',post?'up':'wait');
+      var x=new XMLHttpRequest(),fin=false;
+      function done(){if(t&&!fin)t.end();fin=true;}
+      x.open(opt.method||(post?'POST':'GET'),url,true);
+      if(post)x.setRequestHeader('Content-Type','text/plain;charset=utf-8');
+      x.timeout=120000;
+      if(t){
+        x.upload.onprogress=function(e){if(e.lengthComputable)t.set('up',e.loaded/e.total);};
+        x.upload.onload=function(){t.set('wait');};
+        x.onprogress=function(e){t.set('dl',e.lengthComputable&&e.total?e.loaded/e.total:.5);};
+      }
+      x.onload=function(){
+        done();
+        var j;try{j=JSON.parse(x.responseText);}catch(e){return reject(new Error('Respons server tidak valid. Coba lagi.'));}
+        if(x.status>=400)return reject(new Error('Server bermasalah ('+x.status+').'));
+        resolve(j);
+      };
+      x.onerror=x.ontimeout=x.onabort=function(){done();reject(new Error('Koneksi bermasalah. Periksa internet lalu coba lagi.'));};
+      x.send(post?opt.body:null);
+    });
+  }
+  function work(label,sub,fn){
+    var t=start(label,sub,'wait');
+    return Promise.resolve().then(fn).then(function(v){t.end();return v;},function(e){t.end();throw e;});
+  }
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  return {start:start,xhr:xhr,work:work,sleep:sleep};
+})();
+</script>
+</head>
+<body>
+<main id="login" class="login"><section class="card logincard">
+<img class="login-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)">
+<span class="pill sm"><b>JP SMART SIM</b> Afiliator</span>
+<h1 style="margin-top:10px">Dashboard afiliator</h1>
+<label for="kode">Kode referral</label>
+<input id="kode" type="text" autocapitalize="characters" maxlength="20" autocomplete="username">
+<label for="pin">PIN (6 digit dari PIC)</label>
+<input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+<p id="loginMsg" class="msg bad" role="alert" hidden></p>
+<button id="loginBtn" class="full">Masuk</button>
+</section></main>
+<div id="app" class="shell" hidden>
+<aside id="side" class="side" aria-label="Menu utama">
+<div class="side-head"><div class="brand"><img class="brand-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)"><div><b>JP SMART SIM</b><small>Dashboard afiliator</small></div></div><button id="closeSide" class="iconbtn closeside" aria-label="Tutup menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<div class="who"><b id="hNama"></b><span id="hSub"></span></div>
+<nav class="nav" aria-label="Navigasi"><button data-view="ringkasan" data-title="Ringkasan"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Ringkasan</span></button><button data-view="penerima" data-title="Penerima"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Penerima</span></button><button data-view="tugas" data-title="Tugas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Tugas</span></button><button data-view="materi" data-title="Materi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Materi</span></button></nav>
+<div class="side-foot"><button id="logout" class="ghost"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Keluar</button></div>
+</aside>
+<div id="scrim" class="scrim" hidden></div>
+<div class="main">
+<header class="top"><div class="top-t"><img class="top-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)"><h1 id="pageTitle">Ringkasan</h1></div><button id="burger" class="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="side"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></header>
+<div class="content">
+<div id="banner" class="banner"></div>
+<div id="news" class="banner info" hidden></div>
+<div data-view-pane="ringkasan" hidden>
+  <div class="card">
+    <h2>Link dan kode kamu</h2>
+    <label for="link">Link untuk audiens</label>
+    <div class="row"><input id="link" readonly><button id="copyLink">Salin</button></div>
+    <p class="meta">Kode <b id="kodeTxt"></b> sudah terisi otomatis dan terkunci saat audiens membuka link ini.</p>
+    <div class="qr"><div id="qrBox"></div><a id="qrDl" hidden download>Unduh QR</a></div>
+  </div>
+  <div class="card">
+    <h2>Hasil kamu</h2>
+    <div class="grid g4">
+      <div class="kpi"><b id="kDaftar">0</b><span>Pendaftar</span></div>
+      <div class="kpi"><b id="kAmbil">0</b><span>Sudah ambil</span></div>
+      <div class="kpi"><b id="kBelum">0</b><span>Belum ambil</span></div>
+      <div class="kpi"><b id="kKomisi">Rp0</b><span>Komisi terhitung</span></div>
+    </div>
+    <p class="meta" id="detail"></p>
+    <p class="meta" id="bayar"></p>
+    <h2 style="margin-top:14px">Plafon komisi campaign</h2>
+    <div class="bar"><i id="pBar" style="width:0"></i></div>
+    <p class="meta" id="pTxt"></p>
+    <div id="luar" class="banner info" hidden></div>
+  </div>
+</div>
+<div data-view-pane="penerima" hidden>
+  <div class="card">
+    <h2>14 hari terakhir</h2>
+    <div id="chart" class="chart"></div>
+    <div class="legend"><span class="dot" style="background:var(--acc)"></span>Daftar <span class="dot" style="background:var(--bar2);margin-left:10px"></span>Ambil</div>
+  </div>
+  <div class="card">
+    <h2>Penerima dari kodemu</h2>
+    <div class="scroll tall"><table><thead><tr><th>Tanggal</th><th>Inisial</th><th>Jalur</th><th>Status</th></tr></thead><tbody id="tbody"></tbody></table></div>
+    <p class="meta">Nama dan kontak penerima tidak ditampilkan demi privasi.</p>
+  </div>
+</div>
+<div data-view-pane="tugas" hidden>
+  <div class="card">
+    <h2>Tugasmu</h2>
+    <div id="stepper" class="steps"></div>
+    <div class="bar"><i id="stepBar" style="width:0"></i></div>
+    <p class="meta" id="funnel"></p>
+    <label for="rek">Rekening untuk komisi <span class="meta" id="rekNow"></span></label>
+    <input id="rek" type="text" maxlength="200" placeholder="Bank, nomor rekening, nama pemilik">
+    <button id="rekBtn" class="full">Simpan rekening</button>
+    <label for="kFormat">Kirim link konten yang sudah tayang</label>
+    <select id="kFormat"><option>Video</option><option>Story</option><option>Post</option><option>Lainnya</option></select>
+    <input id="kLink" type="text" placeholder="https://..." style="margin-top:8px">
+    <button id="kBtn" class="full">Kirim link konten</button>
+    <p id="tMsg" class="msg" role="status" hidden style="margin-top:10px"></p>
+    <div id="kList" class="meta" style="margin-top:10px"></div>
+  </div>
+</div>
+<div data-view-pane="materi" hidden>
+  <div class="card">
+    <h2>Teks siap pakai</h2>
+    <p class="meta">Sesuai mode saat ini, kode dan link sudah terisi:</p>
+    <div id="caption" class="caption"></div>
+    <button id="copyCap">Salin teks</button>
+    <p id="brief" class="meta" style="margin-top:12px"></p>
+  </div>
+  <div class="card">
+    <h2>Aturan penting</h2>
+    <ul class="rules" id="rules"></ul>
+    <p class="meta" id="pic" style="margin-top:10px"></p>
+  </div>
+</div>
+</div>
+</div>
+</div>
+<script>
+const Shell = (() => {
+  const g = id => document.getElementById(id);
+  const side = g('side'), scrim = g('scrim'), burger = g('burger');
+  const mq = window.matchMedia('(max-width: 899px)');
+  let onChange = null;
+  const sync = () => { side.inert = mq.matches && !side.classList.contains('open'); };
+  function open(o) {
+    side.classList.toggle('open', o); scrim.hidden = !o;
+    burger.setAttribute('aria-expanded', String(o)); burger.setAttribute('aria-label', o ? 'Tutup menu' : 'Buka menu');
+    document.body.classList.toggle('lock', o); sync();
+    if (o) { const f = side.querySelector('[aria-current=page]') || side.querySelector('.nav button'); if (f) f.focus(); }
+    else if (mq.matches) burger.focus();
+  }
+  burger.addEventListener('click', () => open(!side.classList.contains('open')));
+  g('closeSide').addEventListener('click', () => open(false));
+  scrim.addEventListener('click', () => open(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) open(false); });
+  mq.addEventListener('change', () => { if (!mq.matches && side.classList.contains('open')) open(false); sync(); });
+  function go(name, scroll) {
+    document.querySelectorAll('.nav button[data-view]').forEach(b => {
+      const on = b.dataset.view === name;
+      if (on) { b.setAttribute('aria-current', 'page'); g('pageTitle').textContent = b.dataset.title; } else b.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('[data-view-pane]').forEach(p => { p.hidden = p.dataset.viewPane !== name; });
+    if (scroll !== false) window.scrollTo(0, 0);
+    if (onChange) onChange(name);
+  }
+  document.querySelector('.nav').addEventListener('click', e => {
+    const b = e.target.closest('button[data-view]'); if (!b) return;
+    go(b.dataset.view); if (mq.matches) open(false);
+  });
+  sync();
+  return { go, open, onChange: fn => { onChange = fn; } };
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+// ===== GANTI dengan URL Web App Apps Script (berakhiran /exec) =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbwQ115XVOEhwNOC05oTR1VnxRn-gyVgfbrBgZ4d4YsKGWoifrnU7-L8Y2bUadGOVrWBzw/exec';
+// ===================================================================
+const $ = id => document.getElementById(id);
+const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
+let TOKEN = '', D = null, timer = null;
+try { TOKEN = sessionStorage.getItem('at') || ''; } catch (e) {}
+
+const LBL = { aff_data: 'Memuat dashboard', aff_konten: 'Mengirim link konten', aff_rekening: 'Menyimpan rekening' };
+async function call(action, extra, label) {
+  const r = await JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action, token: TOKEN }, extra || {})) },
+    label === false ? false : (label || LBL[action]));
+  if (r.auth) logout();
+  return r;
+}
+function logout() {
+  TOKEN = ''; try { sessionStorage.removeItem('at'); } catch (e) {}
+  clearInterval(timer); $('app').hidden = true; $('login').hidden = false;
+}
+function say(t, kind) { const m = $('tMsg'); m.textContent = t; m.className = 'msg ' + (kind || ''); m.hidden = !t; }
+
+$('loginBtn').onclick = async () => {
+  const b = $('loginBtn'), m = $('loginMsg'); m.hidden = true; b.disabled = true;
+  try {
+    const r = await JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify({ action: 'aff_login', kode: $('kode').value, pin: $('pin').value }) }, 'Memeriksa kode dan PIN');
+    if (!r.ok) throw new Error(r.error);
+    TOKEN = r.token; $('pin').value = '';
+    try { sessionStorage.setItem('at', TOKEN); } catch (e) {}
+    start();
+  } catch (e) { m.textContent = e.message || 'Gagal masuk. Periksa koneksi.'; m.hidden = false; }
+  b.disabled = false;
+};
+$('logout').onclick = logout;
+
+async function start() {
+  $('login').hidden = true; $('app').hidden = false; Shell.go('ringkasan');
+  await load(); clearInterval(timer); timer = setInterval(() => load(true), 60000);
+}
+
+async function load(silent) {
+  try { const r = await call('aff_data', null, silent === true ? false : undefined); if (r.ok) { D = r; render(); } } catch (e) {}
+}
+
+function captionText() {
+  const L = D.link_form || '[link belum diatur, hubungi PIC]', K = D.profil.kode;
+  if (D.mode === 'GRATIS')
+    return 'Yang tinggal di Tokyo, Chiba, Saitama, dan sekitar, ada SIM gratis dari JP SMART SIM di IJFF Odaiba tanggal 12-13 Desember. Isi link klaimnya dulu, pakai kode ' + K + ', lalu datang mengambil kartunya di booth.\n' + L + '\nKerja sama dengan JP SMART SIM.';
+  return 'SIM dari JP SMART SIM seharga ¥' + Number(D.harga_yen).toLocaleString('id-ID') + ' dengan internet gratis 2 bulan pertama. Daftar lewat link ini dan masukkan kode ' + K + '.\n' + L + '\nKerja sama dengan JP SMART SIM.';
+}
+
+function render() {
+  const p = D.profil, st = D.stat, k = D.komisi, c = D.kampanye;
+  $('hNama').textContent = p.nama; $('hSub').textContent = 'Kode ' + p.kode + ' | jalur ' + p.jalur;
+  const b = $('banner');
+  if (D.mode === 'GRATIS') {
+    b.className = 'banner';
+    b.innerHTML = (D.hari_menuju > 0 ? 'Event <b>' + D.hari_menuju + ' hari lagi</b>. ' : '<b>Event sedang berlangsung</b>. ') + 'Mode: <b>SIM gratis</b>, diambil di booth. ' + esc(D.info_booth);
+  } else if (D.mode === 'BERBAYAR') {
+    b.className = 'banner paid';
+    b.innerHTML = 'Event selesai. Mode: <b>SIM ¥' + Number(D.harga_yen).toLocaleString('id-ID') + '</b> dengan internet gratis 2 bulan. Jangan menyebut SIM-nya gratis.';
+  } else { b.className = 'banner paid'; b.textContent = 'Program sudah ditutup.'; }
+  const n = $('news'); n.hidden = !D.pengumuman; n.textContent = D.pengumuman || '';
+
+  $('link').value = D.link_form || ''; $('kodeTxt').textContent = p.kode;
+  $('qrBox').innerHTML = ''; $('qrDl').hidden = true;
+  if (D.link_form) {
+    try {
+      const q = qrcode(0, 'M'); q.addData(D.link_form); q.make();
+      $('qrBox').innerHTML = q.createSvgTag(5, 2);
+      const a = $('qrDl'); a.href = q.createDataURL(10, 4); a.download = 'qr-' + p.kode + '.gif'; a.hidden = false;
+    } catch (e) {}
+  } else $('link').placeholder = 'Link belum diatur. Hubungi PIC.';
+
+  $('kDaftar').textContent = st.daftar; $('kAmbil').textContent = st.diambil; $('kBelum').textContent = st.belum_ambil;
+  $('kKomisi').textContent = rp(k.total);
+  $('detail').textContent = 'Komisi jalur gratis: ' + k.gratis_valid + ' pengambilan x ' + rp(D.komisi_gratis) +
+    '. Jalur berbayar: ' + st.berbayar_lunas + ' lunas x ' + rp(D.komisi_berbayar) + ' (' + st.berbayar_menunggu + ' menunggu pembayaran).';
+  $('bayar').textContent = 'Sudah dibayar ' + rp(k.dibayar) + ', sisa ' + rp(k.sisa) + '.' + (D.tanggal_bayar ? ' Jadwal pembayaran: ' + D.tanggal_bayar + '.' : '');
+  const pct = c.plafon ? Math.min(100, Math.round(100 * c.diambil_total / c.plafon)) : 0;
+  $('pBar').style.width = pct + '%';
+  $('pTxt').textContent = 'Komisi jalur gratis dihitung untuk ' + c.plafon + ' pengambilan pertama se-campaign. Terpakai: ' + Math.min(c.diambil_total, c.plafon) + ' dari ' + c.plafon + '.';
+  const lu = $('luar'); lu.hidden = !k.gratis_di_luar_plafon;
+  lu.textContent = k.gratis_di_luar_plafon + ' pengambilan dari kodemu terjadi setelah plafon tercapai, jadi tidak dihitung komisi.';
+
+  const mx = Math.max(1, ...D.tren.map(t => Math.max(t.daftar, t.ambil)));
+  $('chart').innerHTML = D.tren.length ? D.tren.map(t =>
+    '<div class="col"><div><i style="height:' + Math.round(100 * t.daftar / mx) + '%;background:var(--acc)" title="Daftar ' + t.daftar + '"></i><i style="height:' + Math.round(100 * t.ambil / mx) + '%;background:var(--bar2)" title="Ambil ' + t.ambil + '"></i></div><small>' + esc(t.tgl.slice(5).replace('-', '/')) + '</small></div>').join('')
+    : '<p class="meta">Belum ada aktivitas.</p>';
+
+  $('tbody').innerHTML = D.penerima.length ? D.penerima.map(r =>
+    '<tr><td>' + esc(r.t.slice(5, 10).replace('-', '/')) + '</td><td>' + esc(r.inisial) + '</td><td>' + esc(r.jenis === 'GRATIS' ? 'Gratis' : 'Berbayar') + '</td><td><span class="badge' + (/Diambil|Lunas/.test(r.status) ? ' ok' : '') + '">' + esc(r.status) + '</span></td></tr>').join('')
+    : '<tr><td colspan="4" class="meta">Belum ada pendaftar dengan kodemu.</td></tr>';
+
+  const steps = [['Setuju ikut', /Setuju|Konten tayang/.test(p.funnel || '')], ['Rekening', D.rekening_terisi], ['Konten', D.konten.length > 0]];
+  const cur = steps.findIndex(x => !x[1]);
+  $('stepper').innerHTML = steps.map((x, i) => '<div class="step ' + (x[1] ? 'done' : i === cur ? 'cur' : '') + '"><i>' + (x[1] ? '\u2713' : i + 1) + '</i>' + x[0] + '</div>').join('');
+  $('stepBar').style.width = Math.round(100 * steps.filter(x => x[1]).length / steps.length) + '%';
+  $('funnel').textContent = 'Status kerja sama: ' + (p.funnel || 'belum dicatat') + '. Link konten terkirim: ' + D.konten.length + '.';
+  $('rekNow').textContent = D.rekening_terisi ? '(tersimpan: ' + D.rekening_mask + ')' : '';
+  $('kList').innerHTML = D.konten.map(x => esc(x.tanggal) + ' | ' + esc(x.format) + ' | ' + esc(x.status)).join('<br>');
+
+  $('caption').textContent = captionText();
+  $('brief').innerHTML = D.link_brief ? 'Brief lengkap: <a href="' + esc(D.link_brief) + '" target="_blank" rel="noopener">buka brief</a>' : 'Brief lengkap belum tersedia.';
+  $('rules').innerHTML = [
+    'Komisi hanya dari orang yang benar-benar mengambil SIM di booth (jalur gratis) atau yang pembayarannya sudah dikonfirmasi (jalur berbayar), memakai kodemu. Pendaftar saja belum dihitung.',
+    'Kode tercatat saat daftar dan tidak bisa diubah. Jika satu nomor WhatsApp mendaftar dua kali, pendaftaran pertama yang berlaku.',
+    'Jangan menulis "gratis selamanya" atau "pasti dapat". Ikuti teks manfaat di brief.',
+    'Angka komisi adalah hitungan, bukan jaminan penghasilan.',
+  ].map(t => '<li>' + esc(t) + '</li>').join('');
+  $('pic').textContent = D.kontak_pic ? 'Pertanyaan? Hubungi PIC: ' + D.kontak_pic : '';
+}
+
+async function copy(text, btn) {
+  try { await navigator.clipboard.writeText(text); const o = btn.textContent; btn.textContent = 'Tersalin'; setTimeout(() => btn.textContent = o, 1500); }
+  catch (e) { prompt('Salin manual:', text); }
+}
+$('copyLink').onclick = e => { if ($('link').value) copy($('link').value, e.target); };
+$('copyCap').onclick = e => { if (D) copy(captionText(), e.target); };
+$('qrDl').addEventListener('click', () => { JPL.work('Mengunduh QR', 'Menyiapkan file gambar', () => JPL.sleep(700)); });
+
+$('rekBtn').onclick = async () => {
+  const b = $('rekBtn'); say(''); b.disabled = true;
+  try {
+    const r = await call('aff_rekening', { rekening: $('rek').value });
+    if (!r.ok) say(r.error, 'bad'); else { say('Rekening tersimpan.', 'good'); $('rek').value = ''; load(true); }
+  } catch (e) { say('Koneksi bermasalah. Coba lagi.', 'bad'); }
+  b.disabled = false;
+};
+$('kBtn').onclick = async () => {
+  const b = $('kBtn'); say(''); b.disabled = true;
+  try {
+    const r = await call('aff_konten', { format: $('kFormat').value, link: $('kLink').value });
+    if (!r.ok) say(r.error, 'bad'); else { say('Link konten terkirim.', 'good'); $('kLink').value = ''; load(true); }
+  } catch (e) { say('Koneksi bermasalah. Coba lagi.', 'bad'); }
+  b.disabled = false;
+};
+
+if (TOKEN) start();
+</script>
+</body>
+</html>
