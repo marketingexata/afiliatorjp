@@ -120,15 +120,14 @@ var JPL=(function(){
   function xhr(url,opt,label){
     opt=opt||{};
     return new Promise(function(resolve,reject){
-      var post=!!opt.body,t=label===false?null:start(label||(post?'Mengirim data':'Memuat data'),'',post?'up':'wait');
+      var post=!!opt.body,t=label===false?null:start(label||(post?'Mengirim data':'Memuat data'),post?'Mengirim data dan memproses di server':'Memuat dari server','wait');
       var x=new XMLHttpRequest(),fin=false;
       function done(){if(t&&!fin)t.end();fin=true;}
       x.open(opt.method||(post?'POST':'GET'),url,true);
       if(post)x.setRequestHeader('Content-Type','text/plain;charset=utf-8');
       x.timeout=120000;
       if(t){
-        x.upload.onprogress=function(e){if(e.lengthComputable)t.set('up',e.loaded/e.total);};
-        x.upload.onload=function(){t.set('wait');};
+        /* JANGAN pasang x.upload.* : listener upload memaksa preflight CORS yang ditolak Apps Script */
         x.onprogress=function(e){t.set('dl',e.lengthComputable&&e.total?e.loaded/e.total:.5);};
       }
       x.onload=function(){
