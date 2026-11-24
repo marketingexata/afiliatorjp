@@ -266,6 +266,12 @@ var JPL=(function(){
 <header class="top"><div class="top-t"><img class="top-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)"><h1 id="pageTitle">Afiliator</h1><span id="phase" class="pill sm"></span></div><button id="burger" class="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="side"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></header>
 <div class="content">
 <p id="msg" class="msg" role="status" hidden></p>
+<div id="pinBox" class="card" hidden>
+  <h2>PIN untuk <span id="pbKode"></span></h2>
+  <div class="codebig" id="pbPin"></div>
+  <p class="meta" id="pbNote"></p>
+  <div class="row" style="flex-wrap:wrap"><button id="pbCopy">Salin PIN</button><button id="pbWa" class="soft">Salin pesan WhatsApp</button><button id="pbClose" class="ghost">Tutup</button></div>
+</div>
 <div class="kpis" id="kpis"></div>
 <div id="alerts"></div>
 <div id="t-afil" data-view-pane="afil" hidden></div><div id="t-event" data-view-pane="event" hidden></div>
@@ -317,18 +323,18 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwQ115XVOEhwNOC05oTR1Vn
 const $ = id => document.getElementById(id);
 const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
 const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
-let TOKEN = '', D = null, TAB = '';
+let TOKEN = '', D = null, TAB = '', PB = null;
 try { TOKEN = sessionStorage.getItem('ad') || ''; } catch (e) {}
 
 const LBL = { adm_data: 'Memuat dashboard', adm_afiliator_set: 'Menyimpan data afiliator', adm_afiliator_baru: 'Menambah afiliator',
-  adm_bayar_konfirmasi: 'Mengonfirmasi pembayaran', adm_konversi: 'Mengalihkan pendaftar', adm_komisi_bayar: 'Mencatat pembayaran komisi' };
+  adm_bayar_konfirmasi: 'Mengonfirmasi pembayaran', adm_konversi: 'Mengalihkan pendaftar', adm_komisi_bayar: 'Mencatat pembayaran komisi', adm_buat_pin: 'Membuat PIN' };
 function post(body, label) { return JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify(body) }, label); }
 async function call(action, extra, label) {
   const r = await post(Object.assign({ action, token: TOKEN }, extra || {}), label === false ? false : (label || LBL[action]));
   if (r.auth) logout();
   return r;
 }
-function logout() { TOKEN = ''; try { sessionStorage.removeItem('ad'); } catch (e) {} $('app').hidden = true; $('login').hidden = false; }
+function logout() { TOKEN = ''; try { sessionStorage.removeItem('ad'); } catch (e) {} PB = null; $('pbPin').textContent = ''; $('pinBox').hidden = true; $('app').hidden = true; $('login').hidden = false; }
 function say(t, kind) { const m = $('msg'); m.textContent = t; m.className = 'msg ' + (kind || ''); m.hidden = !t; if (t) window.scrollTo(0, 0); }
 
 $('loginBtn').onclick = async () => {
@@ -392,15 +398,16 @@ function renderAfil() {
   const rows = D.afiliator.map(a => '<tr data-kode="' + esc(a.kode) + '"><td><b>' + esc(a.kode) + '</b></td><td>' + esc(a.nama) + '</td><td>' + esc(a.jalur) + '</td>' +
     '<td><select data-f="funnel">' + stOpt(a.funnel) + '</select></td><td><input data-f="zoom" type="date" value="' + esc(a.sesi_zoom) + '"></td>' +
     '<td><input data-f="kartu" type="number" min="0" max="1000" value="' + a.kartu_dicetak + '" style="width:80px"></td>' +
-    '<td><input data-f="aktif" type="checkbox"' + (a.aktif ? ' checked' : '') + '></td><td>' + (a.pin_ada ? 'ada' : '<span class="meta">belum</span>') + '</td><td class="n">' + a.konten + '</td>' +
-    '<td><button class="sm" data-act="simpan">Simpan</button></td></tr>');
+    '<td><input data-f="email" type="email" value="' + esc(a.email) + '" maxlength="120" style="min-width:190px"></td><td><input data-f="aktif" type="checkbox"' + (a.aktif ? ' checked' : '') + '></td><td>' + (a.pin_ada ? (a.pin_sementara ? '<span class="badge">sementara</span>' : 'ada') : '<span class="meta">belum</span>') + '</td><td class="n">' + a.konten + '</td>' +
+    '<td><button class="sm" data-act="simpan">Simpan</button> <button class="sm soft" data-act="pin" data-kode="' + esc(a.kode) + '">' + (a.pin_ada ? 'Reset PIN' : 'Buat PIN') + '</button></td></tr>');
   $('t-afil').innerHTML = '<div class="two"><div class="card"><h2>Funnel rekrutmen</h2>' + bars +
     '<p class="meta">Menolak: ' + f.menolak + '. Belum dihubungi: ' + f.belum + '.</p></div>' +
     '<div class="card"><h2>Sesi Zoom (maks. 10 per hari)</h2><p>' + zoom + '</p>' +
     '<h2 style="margin-top:14px">Tambah afiliator</h2><div class="f4"><div><label for="nKode">Kode</label><input id="nKode" maxlength="20"><button type="button" id="nGen" class="sm soft" style="margin-top:6px;width:100%">Buat kode dari nama</button></div><div><label for="nNama">Nama</label><input id="nNama"></div>' +
     '<div><label for="nAkun">Akun</label><input id="nAkun"></div><div><label for="nJalur">Jalur</label><select id="nJalur"><option value="mandiri">mandiri</option><option value="tambahan">tambahan</option></select></div><button id="nBtn">Tambah</button></div>' +
-    '<p class="meta">Afiliator baru nonaktif sampai Anda mencentang Aktif. PIN dibuat lewat menu JP SMART SIM di Google Sheet.</p></div></div>' +
-    '<div class="card"><h2>Daftar afiliator</h2>' + tbl([['Kode'], ['Nama'], ['Jalur'], ['Status'], ['Zoom'], ['Kartu dicetak'], ['Aktif'], ['PIN'], ['Konten', 1], ['']], rows, 'Belum ada afiliator.') + '</div>';
+    '<div class="f4" style="margin-top:8px"><div><label for="nEmail">Email (untuk lupa PIN)</label><input id="nEmail" type="email" autocomplete="off" maxlength="120"></div><label class="check"><input id="nPin" type="checkbox" checked><span>Buat PIN sekarang</span></label><label class="check"><input id="nAktif" type="checkbox" checked><span>Aktifkan sekarang</span></label></div>' +
+    '<p class="meta">PIN dibuat otomatis dan ditampilkan sekali di layar ini; kirim ke afiliator lewat WhatsApp setelah mereka membalas "saya setuju ikut". Afiliator bisa mengganti PIN sendiri dan mendaftarkan email di menu Akun.</p></div></div>' +
+    '<div class="card"><h2>Daftar afiliator</h2>' + tbl([['Kode'], ['Nama'], ['Jalur'], ['Status'], ['Zoom'], ['Kartu dicetak'], ['Email'], ['Aktif'], ['PIN'], ['Konten', 1], ['']], rows, 'Belum ada afiliator.') + '</div>';
 }
 
 function renderEvent() {
@@ -445,6 +452,24 @@ function renderSistem() {
     '<p class="meta">Ubah nilai di sheet Pengaturan. Perubahan berlaku pada muat ulang berikutnya. PIN booth, hash admin, dan folder bukti tidak ditampilkan.</p></div>';
 }
 
+function showPin(kode, nama, pin, aktif) {
+  PB = { kode, nama, pin };
+  $('pbKode').textContent = kode; $('pbPin').textContent = pin;
+  $('pbNote').textContent = (aktif ? '' : 'Afiliator ini belum aktif: centang Aktif di tabel supaya PIN bisa dipakai. ') + 'PIN hanya ditampilkan sekali dan tidak bisa dilihat lagi. Sarankan afiliator segera menggantinya di menu Akun.';
+  $('pinBox').hidden = false; window.scrollTo(0, 0);
+}
+async function copyText(t, btn) {
+  try { await navigator.clipboard.writeText(t); const o = btn.textContent; btn.textContent = 'Tersalin'; setTimeout(() => { btn.textContent = o; }, 1500); }
+  catch (e) { prompt('Salin manual:', t); }
+}
+$('pbCopy').onclick = e => { if (PB) copyText(PB.pin, e.target); };
+$('pbWa').onclick = e => {
+  if (!PB) return;
+  const url = new URL('afiliator.html', location.href).href;
+  copyText('Halo ' + PB.nama + ', terima kasih sudah ikut program afiliator JP SMART SIM.\nDashboard: ' + url + '\nKode referral: ' + PB.kode + '\nPIN: ' + PB.pin + '\nSetelah masuk, ganti PIN di menu Akun dan daftarkan email agar bisa meminta PIN baru sendiri.', e.target);
+};
+$('pbClose').onclick = () => { PB = null; $('pbPin').textContent = ''; $('pinBox').hidden = true; };
+
 document.addEventListener('click', async e => {
   const b = e.target.closest('button[data-act],#nBtn,#nGen,#konv,#csv'); if (!b) return;
   const act = b.dataset.act || b.id;
@@ -467,9 +492,18 @@ document.addEventListener('click', async e => {
   }
   if (act === 'simpan') {
     const tr = b.closest('tr'), g = f => tr.querySelector('[data-f=' + f + ']');
-    return run(() => call('adm_afiliator_set', { kode: tr.dataset.kode, funnel: g('funnel').value, sesi_zoom: g('zoom').value, kartu_dicetak: g('kartu').value, aktif: g('aktif').checked }), () => 'Tersimpan: ' + tr.dataset.kode + '.');
+    return run(() => call('adm_afiliator_set', { kode: tr.dataset.kode, funnel: g('funnel').value, sesi_zoom: g('zoom').value, kartu_dicetak: g('kartu').value, email: g('email').value, aktif: g('aktif').checked }), () => 'Tersimpan: ' + tr.dataset.kode + '.');
   }
-  if (act === 'nBtn') return run(() => call('adm_afiliator_baru', { kode: $('nKode').value, nama: $('nNama').value, akun: $('nAkun').value, jalur: $('nJalur').value }), () => 'Afiliator ditambahkan (nonaktif). Centang Aktif setelah siap.');
+  if (act === 'nBtn') {
+    const nm = $('nNama').value.trim();
+    return run(() => call('adm_afiliator_baru', { kode: $('nKode').value, nama: nm, akun: $('nAkun').value, jalur: $('nJalur').value, email: $('nEmail').value, buat_pin: $('nPin').checked, aktif: $('nAktif').checked }),
+      r => { if (r.pin) showPin(r.kode, nm, r.pin, r.aktif); return 'Afiliator ' + r.kode + ' ditambahkan' + (r.pin ? ' dan PIN dibuat.' : '.'); });
+  }
+  if (act === 'pin') {
+    const nm = b.closest('tr').children[1].textContent;
+    if (!confirm('Buat PIN baru untuk ' + b.dataset.kode + '? PIN lama (jika ada) langsung tidak berlaku.')) return;
+    return run(() => call('adm_buat_pin', { kode: b.dataset.kode }), r => { showPin(r.kode, nm, r.pin, r.aktif); return 'PIN baru dibuat untuk ' + r.kode + '.'; });
+  }
   if (act === 'lunas') {
     const cat = prompt('Catatan bukti pembayaran (opsional):'); if (cat === null) return;
     return run(() => call('adm_bayar_konfirmasi', { id: b.dataset.id, catatan: cat }), () => 'Pembayaran ' + b.dataset.id + ' dikonfirmasi.');
