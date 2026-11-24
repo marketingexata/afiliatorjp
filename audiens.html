@@ -5,38 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Klaim SIM JP SMART SIM - IJFF Odaiba 2026</title>
 <style>
-:root{--bg:#eef3f6;--card:#fff;--ink:#13233a;--mute:#5b6b7d;--line:#d3dce4;--acc:#0b7a83;--acc-ink:#fff;--warn:#9a4a00;--warn-bg:#fff2e0;--err:#b3261e;--ok-bg:#e3f4f2}
-@media(prefers-color-scheme:dark){:root{--bg:#0e1722;--card:#16222f;--ink:#e8eef4;--mute:#9bacbd;--line:#2c3b4c;--acc:#45bcc4;--acc-ink:#06202a;--warn:#ffb866;--warn-bg:#33240f;--err:#ff8a80;--ok-bg:#12302f}}
+:root{--pink:#f0156e;--acc:#f0156e;--crimson:#d4005a;--ink:#24112f;--mute:#7b6687;--line:#f3d6e5;--soft:#fff0f6;--soft2:#ffe0ee;--ok:#1f9d63;--ok-bg:#e3f6ec;--warn:#8a3d00;--warn-bg:#fff3e0;--err:#d92d20;--bar2:#ff9f1c;--navy:#1a1033;--gold:#ffe600;--grad:linear-gradient(135deg,#ff2d86,#d4005a)}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:16px/1.55 "Avenir Next","Segoe UI",system-ui,sans-serif;padding:20px 16px 48px}
+body{min-height:100vh;color:var(--ink);font:15px/1.55 "Plus Jakarta Sans","Avenir Next","Segoe UI",system-ui,sans-serif;background:#c2005a;padding:16px 14px 48px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(48px,env(safe-area-inset-bottom))}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,#ff1d7c 0%,#ff4f9a 48%,#c2005a 100%)}
 main{max-width:480px;margin:0 auto}
-h1{font-size:1.6rem;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em}
-.sub{color:var(--mute);margin:0 0 18px}
-.banner{border-radius:10px;padding:12px 14px;margin-bottom:18px;background:var(--ok-bg);border-left:4px solid var(--acc)}
-.banner.paid{background:var(--warn-bg);border-color:var(--warn)}
-.banner strong{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
-label{display:block;font-weight:600;margin:14px 0 4px}
+h1{font-size:1.35rem;line-height:1.25;margin:8px 0 4px}
+h2{font-size:1.05rem;margin:0 0 10px}
+.sub{color:var(--mute);margin:0}
+.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px rgba(80,0,40,.18)}
+.head{display:flex;align-items:center;gap:14px}
+.head .brandlogo{height:56px;width:auto;max-width:96px;object-fit:contain;flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-radius:99px;padding:4px 12px;font-size:.82rem;font-weight:700}
+.pill b{color:var(--gold)}
+.banner{border-radius:18px;padding:12px 16px;margin-bottom:14px;background:var(--navy);color:#fff;font-weight:600}
+.banner strong{display:block;color:var(--gold)}
+.banner.paid{background:var(--warn-bg);color:var(--warn);border-left:5px solid var(--bar2)}
+.banner.paid strong{color:var(--warn)}
+label{display:block;font-weight:700;margin:14px 0 4px}
 label:first-child{margin-top:0}
-input[type=text],input[type=tel],select{width:100%;padding:11px 12px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px}
-input:focus,select:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
-input[readonly]{opacity:.85;font-weight:700;letter-spacing:.06em}
-.hint{font-size:.86rem;color:var(--mute);margin:4px 0 0}
-.hint.bad{color:var(--err)}
-.hint.good{color:var(--acc)}
-.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-top:16px}
-.check input{margin-top:5px;width:18px;height:18px;flex:none}
-button{width:100%;margin-top:18px;padding:13px;font:inherit;font-weight:700;color:var(--acc-ink);background:var(--acc);border:0;border-radius:10px;cursor:pointer}
+input[type=text],input[type=tel],select{width:100%;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:14px}
+input:focus,select:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 4px rgba(240,21,110,.16)}
+input[readonly]{background:var(--soft);font-weight:800;letter-spacing:.06em}
+.hint{font-size:.86rem;color:var(--mute);margin:4px 0 0;font-weight:500}
+.hint.bad{color:var(--err);font-weight:700}
+.hint.good{color:var(--ok);font-weight:700}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:16px}
+.check input{margin-top:3px;width:20px;height:20px;flex:none;accent-color:var(--pink)}
+button{width:100%;margin-top:16px;padding:13px 18px;font:inherit;font-weight:800;color:#fff;background:var(--grad);border:0;border-radius:14px;cursor:pointer;box-shadow:0 8px 18px rgba(212,0,90,.25)}
+button:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
 button[disabled]{opacity:.6;cursor:wait}
-.err{color:var(--err);margin:12px 0 0;font-weight:600}
+.err{color:var(--err);margin:12px 0 0;font-weight:700}
+#loadErr{background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 10px 30px rgba(80,0,40,.18)}
+#err{background:#ffe9e7;border-radius:14px;padding:10px 14px}
 .hp{position:absolute;left:-9999px;height:0;overflow:hidden}
-.ticket{background:var(--card);border:2px dashed var(--acc);border-radius:16px;padding:24px 20px;text-align:center}
-.ticket .id{font-size:2.1rem;font-weight:800;letter-spacing:.14em;margin:6px 0}
+.ticket{background:#fff;border:3px dashed var(--pink);border-radius:24px;padding:24px 20px;text-align:center;box-shadow:0 10px 30px rgba(80,0,40,.18)}
+.ticket .id{font-size:2.1rem;font-weight:800;letter-spacing:.14em;margin:8px 0;color:var(--crimson)}
 .ticket ul{text-align:left;margin:14px 0 0;padding-left:20px}
+.ticket li{margin-bottom:4px}
 [hidden]{display:none!important}
 @media(prefers-reduced-motion:no-preference){.ticket{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.97);opacity:0}}}
 </style>
+<meta name="theme-color" content="#ff1d7c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="https://marketingexata.github.io/afiliatorjp/logojps.png">
 <style id="jpl-css">
 .brand-logo{height:40px;width:auto;max-width:132px;object-fit:contain;flex:none;border-radius:10px}
@@ -148,14 +162,18 @@ var JPL=(function(){
   return {start:start,xhr:xhr,work:work,sleep:sleep};
 })();
 </script>
-<style>.brandlogo{display:block;height:54px;max-width:200px;object-fit:contain;margin:0 0 12px}:root{--jpl2:#45bcc4}</style>
 <style>.sosrow{display:grid;grid-template-columns:140px 1fr;gap:8px}@media(max-width:360px){.sosrow{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <main>
-  <img class="brandlogo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)">
-  <h1>Klaim SIM JP SMART SIM</h1>
-  <p class="sub">Indonesia Japan Friendship Festival 2026, Odaiba</p>
+  <header class="card head">
+    <img class="brandlogo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)">
+    <div>
+      <span class="pill"><b>JP SMART SIM</b> IJFF 2026</span>
+      <h1>Klaim SIM JP SMART SIM</h1>
+      <p class="sub">Indonesia Japan Friendship Festival 2026, Odaiba</p>
+    </div>
+  </header>
 
   <div id="banner" class="banner" hidden></div>
   <div id="loadErr" class="err" hidden></div>
