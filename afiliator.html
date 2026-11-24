@@ -132,6 +132,7 @@ ul.rules{margin:0;padding-left:20px}ul.rules li{margin:4px 0}
 .actionbar button{flex:1;max-width:340px;padding:14px}
 @media(min-width:900px){.actionbar{left:calc(var(--side-w) + 32px)}}
 [hidden]{display:none!important}
+.linkbtn{display:block;width:100%;background:none;box-shadow:none;color:var(--pink);padding:10px 0 0;margin:6px 0 0;font-weight:700;text-decoration:underline;text-align:center;border-radius:0}
 </style>
 <link rel="icon" href="https://marketingexata.github.io/afiliatorjp/logojps.png">
 <style id="jpl-css">
@@ -256,18 +257,32 @@ var JPL=(function(){
 <img class="login-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)">
 <span class="pill sm"><b>JP SMART SIM</b> Afiliator</span>
 <h1 style="margin-top:10px">Dashboard afiliator</h1>
+<div id="loginForm">
 <label for="kode">Kode referral</label>
 <input id="kode" type="text" autocapitalize="characters" maxlength="20" autocomplete="username">
-<label for="pin">PIN (6 digit dari PIC)</label>
+<label for="pin">PIN (6 digit)</label>
 <div class="pw"><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password"><button type="button" id="pinEye" class="eye" aria-label="Tampilkan PIN" aria-pressed="false"><svg class="eye-on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19c-7 0-11-7-11-7a19.8 19.8 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a19.9 19.9 0 0 1-3.17 4.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg></button></div>
 <p id="loginMsg" class="msg bad" role="alert" hidden></p>
 <button id="loginBtn" class="full">Masuk</button>
+<button type="button" id="forgotLink" class="linkbtn">Lupa PIN?</button>
+</div>
+<div id="forgot" hidden>
+<h2 style="margin-top:6px">Lupa PIN</h2>
+<p class="meta">Masukkan kode referral dan email yang terdaftar di akunmu. PIN baru dikirim ke email itu. Email didaftarkan di menu Akun setelah masuk, atau oleh admin.</p>
+<label for="fKode">Kode referral</label>
+<input id="fKode" type="text" autocapitalize="characters" maxlength="20" autocomplete="off">
+<label for="fEmail">Email terdaftar</label>
+<input id="fEmail" type="email" autocomplete="email" maxlength="120">
+<p id="fMsg" class="msg" role="status" hidden></p>
+<button id="fBtn" class="full">Kirim PIN baru</button>
+<button type="button" id="fBack" class="ghost full">Kembali ke login</button>
+</div>
 </section></main>
 <div id="app" class="shell" hidden>
 <aside id="side" class="side" aria-label="Menu utama">
 <div class="side-head"><div class="brand"><img class="brand-logo" src="https://marketingexata.github.io/afiliatorjp/logojps.png" alt="JP SMART SIM" onerror="jpLogoErr(this)"><div><b>JP SMART SIM</b><small>Dashboard afiliator</small></div></div><button id="closeSide" class="iconbtn closeside" aria-label="Tutup menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
 <div class="who"><b id="hNama"></b><span id="hSub"></span></div>
-<nav class="nav" aria-label="Navigasi"><button data-view="ringkasan" data-title="Ringkasan"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Ringkasan</span></button><button data-view="penerima" data-title="Penerima"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Penerima</span></button><button data-view="tugas" data-title="Tugas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Tugas</span></button><button data-view="materi" data-title="Materi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Materi</span></button></nav>
+<nav class="nav" aria-label="Navigasi"><button data-view="ringkasan" data-title="Ringkasan"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Ringkasan</span></button><button data-view="penerima" data-title="Penerima"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Penerima</span></button><button data-view="tugas" data-title="Tugas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Tugas</span></button><button data-view="materi" data-title="Materi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Materi</span></button><button data-view="akun" data-title="Akun"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Akun</span></button></nav>
 <div class="side-foot"><button id="logout" class="ghost"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Keluar</button></div>
 </aside>
 <div id="scrim" class="scrim" hidden></div>
@@ -276,6 +291,7 @@ var JPL=(function(){
 <div class="content">
 <div id="banner" class="banner"></div>
 <div id="news" class="banner info" hidden></div>
+<div id="acctBanner" class="banner info" hidden><span id="acctTxt"></span> <button type="button" id="acctGo" class="sm" style="margin-left:6px">Atur sekarang</button></div>
 <div data-view-pane="ringkasan" hidden>
   <div class="card">
     <h2>Link dan kode kamu</h2>
@@ -327,6 +343,29 @@ var JPL=(function(){
     <button id="kBtn" class="full">Kirim link konten</button>
     <p id="tMsg" class="msg" role="status" hidden style="margin-top:10px"></p>
     <div id="kList" class="meta" style="margin-top:10px"></div>
+  </div>
+</div>
+<div data-view-pane="akun" hidden>
+  <div class="card">
+    <h2>Ubah PIN</h2>
+    <p class="meta">PIN terdiri dari 6 angka. Hindari angka berurutan atau berulang (misalnya 123456 atau 111111).</p>
+    <label for="pLama">PIN saat ini</label>
+    <input id="pLama" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <label for="pBaru">PIN baru</label>
+    <input id="pBaru" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+    <label for="pBaru2">Ulangi PIN baru</label>
+    <input id="pBaru2" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+    <button id="pBtn" class="full">Simpan PIN baru</button>
+  </div>
+  <div class="card">
+    <h2>Email untuk lupa PIN</h2>
+    <p class="meta" id="emNow"></p>
+    <label for="emIn">Alamat email</label>
+    <input id="emIn" type="email" autocomplete="email" maxlength="120">
+    <label for="emPin">PIN saat ini (untuk konfirmasi)</label>
+    <input id="emPin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <button id="emBtn" class="full">Simpan email</button>
+    <p id="aMsg" class="msg" role="status" hidden style="margin-top:10px"></p>
   </div>
 </div>
 <div data-view-pane="materi" hidden>
@@ -399,7 +438,7 @@ const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
 let TOKEN = '', D = null, timer = null;
 try { TOKEN = sessionStorage.getItem('at') || ''; } catch (e) {}
 
-const LBL = { aff_data: 'Memuat dashboard', aff_konten: 'Mengirim link konten', aff_rekening: 'Menyimpan rekening' };
+const LBL = { aff_data: 'Memuat dashboard', aff_konten: 'Mengirim link konten', aff_rekening: 'Menyimpan rekening', aff_ubah_pin: 'Menyimpan PIN baru', aff_email: 'Menyimpan email' };
 async function call(action, extra, label) {
   const r = await JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action, token: TOKEN }, extra || {})) },
     label === false ? false : (label || LBL[action]));
@@ -501,6 +540,12 @@ function render() {
     'Angka komisi adalah hitungan, bukan jaminan penghasilan.',
   ].map(t => '<li>' + esc(t) + '</li>').join('');
   $('pic').textContent = D.kontak_pic ? 'Pertanyaan? Hubungi PIC: ' + D.kontak_pic : '';
+
+  const ab = $('acctBanner');
+  const need = D.pin_sementara ? 'PIN-mu masih PIN sementara dari admin. Buat PIN pribadi dan daftarkan email supaya bisa meminta PIN baru sendiri jika lupa.'
+    : (!D.email_terisi ? 'Daftarkan email supaya kamu bisa meminta PIN baru sendiri jika lupa PIN.' : '');
+  ab.hidden = !need; $('acctTxt').textContent = need;
+  $('emNow').textContent = D.email_terisi ? 'Email terdaftar: ' + D.email_mask : 'Belum ada email terdaftar. Tanpa email, fitur lupa PIN tidak bisa dipakai.';
 }
 
 async function copy(text, btn) {
@@ -525,6 +570,47 @@ $('kBtn').onclick = async () => {
     const r = await call('aff_konten', { format: $('kFormat').value, link: $('kLink').value });
     if (!r.ok) say(r.error, 'bad'); else { say('Link konten terkirim.', 'good'); $('kLink').value = ''; load(true); }
   } catch (e) { say('Koneksi bermasalah. Coba lagi.', 'bad'); }
+  b.disabled = false;
+};
+
+/* ---- lupa PIN (di layar login) ---- */
+$('forgotLink').onclick = () => { $('loginForm').hidden = true; $('forgot').hidden = false; $('fKode').value = $('kode').value; $('fMsg').hidden = true; };
+$('fBack').onclick = () => { $('forgot').hidden = true; $('loginForm').hidden = false; };
+$('fBtn').onclick = async () => {
+  const b = $('fBtn'), m = $('fMsg'); m.hidden = true; b.disabled = true;
+  try {
+    const r = await JPL.xhr(API_URL, { method: 'POST', body: JSON.stringify({ action: 'aff_lupa_pin', kode: $('fKode').value, email: $('fEmail').value }) }, 'Mengirim permintaan PIN baru');
+    m.textContent = r.ok ? r.message : r.error; m.className = 'msg ' + (r.ok ? 'good' : 'bad');
+  } catch (e) { m.textContent = e.message || 'Koneksi bermasalah. Coba lagi.'; m.className = 'msg bad'; }
+  m.hidden = false; b.disabled = false;
+};
+
+/* ---- menu Akun: ubah PIN dan email pemulihan ---- */
+function sayA(t, kind) { const m = $('aMsg'); m.textContent = t; m.className = 'msg ' + (kind || ''); m.hidden = !t; }
+$('acctGo').onclick = () => Shell.go('akun');
+$('pBtn').onclick = async () => {
+  const b = $('pBtn'), lama = $('pLama').value.trim(), baru = $('pBaru').value.trim(); sayA('');
+  if (!/^\d{6}$/.test(baru)) return sayA('PIN baru harus 6 angka.', 'bad');
+  if (baru !== $('pBaru2').value.trim()) return sayA('Ulangi PIN baru dengan benar.', 'bad');
+  b.disabled = true;
+  try {
+    const r = await call('aff_ubah_pin', { pin_lama: lama, pin_baru: baru });
+    if (!r.ok) sayA(r.error, 'bad');
+    else {
+      TOKEN = r.token; try { sessionStorage.setItem('at', TOKEN); } catch (e) {}
+      ['pLama', 'pBaru', 'pBaru2'].forEach(i => { $(i).value = ''; });
+      sayA('PIN berhasil diganti. Pakai PIN baru saat masuk berikutnya.', 'good'); load(true);
+    }
+  } catch (e) { sayA(e.message || 'Koneksi bermasalah. Coba lagi.', 'bad'); }
+  b.disabled = false;
+};
+$('emBtn').onclick = async () => {
+  const b = $('emBtn'); sayA(''); b.disabled = true;
+  try {
+    const r = await call('aff_email', { email: $('emIn').value, pin: $('emPin').value });
+    if (!r.ok) sayA(r.error, 'bad');
+    else { $('emIn').value = ''; $('emPin').value = ''; sayA('Email tersimpan: ' + r.email_mask + '.', 'good'); load(true); }
+  } catch (e) { sayA(e.message || 'Koneksi bermasalah. Coba lagi.', 'bad'); }
   b.disabled = false;
 };
 
