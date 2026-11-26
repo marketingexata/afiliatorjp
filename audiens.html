@@ -163,6 +163,13 @@ var JPL=(function(){
 })();
 </script>
 <style>.sosrow{display:grid;grid-template-columns:140px 1fr;gap:8px}@media(max-width:360px){.sosrow{grid-template-columns:1fr}}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+.qrwrap{margin:14px auto 0;max-width:300px}
+.qrwrap img{display:block;width:100%;height:auto;border-radius:16px;border:2px solid var(--line)}
+.btnlink{display:block;margin-top:12px;padding:13px 18px;border-radius:14px;background:var(--grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 8px 18px rgba(212,0,90,.25)}
+.btnlink:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+</style>
 </head>
 <body>
 <main>
@@ -305,6 +312,31 @@ $('form').addEventListener('submit', async ev => {
   }
 });
 
+// Gambar tiket (PNG): QR berisi kode tiket apa adanya + kode dalam huruf besar, siap disimpan ke galeri
+function makeTicketPng(id) {
+  if (typeof qrcode === 'undefined') return '';
+  try {
+    const q = qrcode(0, 'M'); q.addData(id); q.make();
+    const n = q.getModuleCount(), quiet = 4, cell = Math.max(4, Math.floor(480 / (n + 2 * quiet)));
+    const side = cell * (n + 2 * quiet), W = 640, y0 = 110, H = y0 + side + 150;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+    g.textAlign = 'center'; g.fillStyle = '#d4005a'; g.font = '800 38px "Plus Jakarta Sans",system-ui,sans-serif';
+    g.fillText('JP SMART SIM', W / 2, 54);
+    g.fillStyle = '#7b6687'; g.font = '600 21px "Plus Jakarta Sans",system-ui,sans-serif';
+    g.fillText('Tiket klaim SIM - IJFF Odaiba 2026', W / 2, 88);
+    g.fillStyle = '#1a1033';
+    const x0 = Math.floor((W - side) / 2) + quiet * cell, yy = y0 + quiet * cell;
+    for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r, k)) g.fillRect(x0 + k * cell, yy + r * cell, cell, cell);
+    g.fillStyle = '#d4005a'; g.font = '800 58px "Plus Jakarta Sans",system-ui,sans-serif';
+    g.fillText(id, W / 2, y0 + side + 66);
+    g.fillStyle = '#7b6687'; g.font = '600 20px "Plus Jakarta Sans",system-ui,sans-serif';
+    g.fillText('Tunjukkan QR ini beserta identitas di booth', W / 2, y0 + side + 108);
+    return c.toDataURL('image/png');
+  } catch (e) { return ''; }
+}
+
 function renderDone(r) {
   $('form').hidden = true; $('banner').hidden = true;
   const d = $('done'); d.hidden = false;
@@ -313,13 +345,19 @@ function renderDone(r) {
     return;
   }
   const gratis = r.mode === 'GRATIS';
+  const png = makeTicketPng(r.id);
   d.innerHTML =
     '<p>Pendaftaran berhasil. Simpan tiket ini.</p>' +
     '<div class="id">' + esc(r.id) + '</div>' +
+    (png ? '<div class="qrwrap"><img src="' + png + '" alt="QR tiket ' + esc(r.id) + '">' +
+      '<a id="qrSave" class="btnlink" href="' + png + '" download="tiket-' + esc(r.id) + '.png">Simpan QR</a>' +
+      '<p class="hint">Jika tidak tersimpan otomatis, tekan lama gambar lalu pilih Simpan gambar.</p></div>' : '') +
     '<ul>' + (gratis
-      ? '<li>Screenshot halaman ini.</li><li>Datang ke ' + esc(CFG.info_booth) + '.</li><li>Tunjukkan tiket dan identitas ke staf booth.</li>'
-      : '<li>Screenshot halaman ini.</li><li>' + esc(CFG.info_bayar) + '</li><li>SIM diproses setelah pembayaran ¥' + Number(CFG.harga_yen).toLocaleString('id-ID') + ' dikonfirmasi.</li>') +
+      ? '<li>Simpan QR di atas (atau screenshot halaman ini).</li><li>Datang ke ' + esc(CFG.info_booth) + '.</li><li>Tunjukkan QR atau kode tiket beserta identitas ke staf booth.</li>'
+      : '<li>Simpan QR di atas (atau screenshot halaman ini).</li><li>' + esc(CFG.info_bayar) + '</li><li>SIM diproses setelah pembayaran ¥' + Number(CFG.harga_yen).toLocaleString('id-ID') + ' dikonfirmasi.</li>') +
     '</ul>';
+  const sv = $('qrSave');
+  if (sv) sv.addEventListener('click', () => { JPL.work('Menyimpan QR', 'Menyiapkan gambar tiket', () => JPL.sleep(600)); });
   window.scrollTo(0, 0);
 }
 
