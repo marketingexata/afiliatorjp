@@ -325,12 +325,6 @@ var JPL=(function(){
   </div>
   <div id="jpv" class="card" hidden>
     <h2>Voucher JP Landing</h2>
-    <div id="jpvPin" hidden>
-      <label for="jpPin">PIN admin JP Landing</label>
-      <input id="jpPin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN dari admin">
-      <p class="meta">Diminta sekali per sesi dan tidak disimpan setelah tab ditutup.</p>
-      <button id="jpPinOk" type="button">Lanjut</button>
-    </div>
     <div id="jpvInfo" hidden>
       <div class="res" style="padding-top:0"><h3 id="jpvNama"></h3><div class="meta" id="jpvMeta"></div><div id="jpvBadge" style="margin-top:6px"></div></div>
       <div id="jpvWarn" class="note" hidden></div>
@@ -463,7 +457,7 @@ function showApp() {
 }
 
 function logout() {
-  closeScan(); jpHide(); jpPinSet(''); showHO(false); HO = null;
+  closeScan(); jpHide(); showHO(false); HO = null;
   TOKEN = ''; try { sessionStorage.removeItem('bt'); sessionStorage.removeItem('bs'); } catch (e) {}
   clearInterval(statTimer); $('app').hidden = true; $('login').hidden = false;
 }
@@ -712,80 +706,54 @@ $('scanTorch').onclick = async () => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('scan').hidden) closeScan(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) closeScan(); });
 
-/* ---------- voucher JP Landing (jpland.html): kode JPS-XXXXX, dicek ke Apps Script JP Landing ----------
-   Staf tetap memakai satu aplikasi ini. PIN admin JP Landing diminta sekali per sesi (tidak ditanam di file ini). */
-const JPLAND_URL = 'https://script.google.com/macros/s/AKfycby63h3yHxPiYYcCnnwpeG_Ck_FpU_77gkiB9MuTP41F_uR2ygCwdhXdnmF7s-i0-qXQGg/exec';
+/* ---------- voucher JP Landing (jpland.html): kode JPS-XXXXX ----------
+   Diperiksa dan dicatat lewat server utama memakai sesi login staf ini, jadi tidak ada PIN kedua. */
 const JPS_RE = /^JPS-[A-HJ-NP-Z2-9]{5}$/;
 let JP = { code: '', item: null };
-const jpCall = (body, label) => JPL.xhr(JPLAND_URL, { method: 'POST', body: JSON.stringify(body) }, label);
-function jpPin() { try { return sessionStorage.getItem('jp_pin') || ''; } catch (e) { return ''; } }
-function jpPinSet(v) { try { if (v) sessionStorage.setItem('jp_pin', v); else sessionStorage.removeItem('jp_pin'); } catch (e) {} }
-function jpHide() { JP = { code: '', item: null }; $('jpv').hidden = true; $('jpvPin').hidden = true; $('jpvInfo').hidden = true; $('jpvCek').checked = false; }
-
-// Peringatan lunak: nomor yang sama sudah/terdaftar di sistem booth utama (tidak memblokir, hanya mengingatkan staf)
-async function jpCross(wa) {
-  const d = String(wa || '').replace(/[^0-9]/g, '');
-  if (d.length < 9) return '';
-  try {
-    const r = await call('booth_cari', { q: d.slice(-9) }, false);
-    const l = (r && r.hasil) || [], t = l.find(p => p.status === 'Diambil');
-    if (t) return 'Nomor ini sudah mengambil kartu lewat sistem booth utama (tiket ' + t.id + ', ' + String(t.waktu_ambil || '').slice(0, 16) + ', staf ' + t.staf + '). Pastikan tidak ganda sebelum menyerahkan.';
-    if (l.length) return 'Nomor ini juga terdaftar di sistem booth utama (tiket ' + l[0].id + ', belum diambil). Pastikan hanya satu kartu yang diserahkan.';
-  } catch (e) {}
-  return '';
-}
+function jpHide() { JP = { code: '', item: null }; $('jpv').hidden = true; $('jpvInfo').hidden = true; $('jpvAct').hidden = true; $('jpvWarn').hidden = true; $('jpvCek').checked = false; }
 
 async function lookupJp(code) {
   if (HO) { showHO(false); HO = null; }
-  JP = { code, item: null };
-  $('jpv').hidden = false; $('jpvInfo').hidden = true; $('jpvAct').hidden = true; $('jpvWarn').hidden = true; $('jpvCek').checked = false;
-  if (!jpPin()) { $('jpvPin').hidden = false; $('jpPin').value = ''; $('jpPin').focus(); return say('Voucher ' + code + ' dari JP Landing. Masukkan PIN admin JP Landing untuk memeriksa.', 'good'); }
-  $('jpvPin').hidden = true;
+  jpHide(); JP = { code, item: null }; $('jpv').hidden = false;
   try {
-    const r = await jpCall({ action: 'admin_lookup', pin: jpPin(), voucher: code }, 'Memeriksa voucher JP Landing');
-    if (r.status === 'unauthorized') { jpPinSet(''); $('jpvPin').hidden = false; $('jpPin').value = ''; return say('PIN admin JP Landing salah.', 'bad'); }
+    const r = await call('booth_jp_cek', { voucher: code }, 'Memeriksa voucher JP Landing');
+    if (!r.ok) { jpHide(); return say(r.error, 'bad'); }
     if (r.status === 'not_found') { jpHide(); return say('Voucher ' + code + ' tidak ditemukan di JP Landing.', 'bad'); }
-    if (r.status !== 'found' || !r.item) { jpHide(); return say(r.message || 'Voucher tidak bisa diperiksa. Coba lagi.', 'bad'); }
     const it = r.item; JP.item = it;
     $('jpvNama').textContent = it.nama;
-    $('jpvMeta').textContent = it.voucher + ' | WA ....' + String(it.whatsapp || '').replace(/[^0-9]/g, '').slice(-4) + ' | daftar ' + it.timestamp;
+    $('jpvMeta').textContent = it.voucher + ' | WA ....' + it.wa_akhir + ' | daftar ' + it.daftar;
     const done = it.status === 'Sudah Diambil';
     $('jpvBadge').innerHTML = r.expired ? '<span class="badge">Voucher kedaluwarsa</span>'
-      : done ? '<span class="badge done">Sudah diambil ' + esc(it.redeemedAt) + ' oleh ' + esc(it.staffName || '-') + '</span>'
+      : done ? '<span class="badge done">Sudah diambil ' + esc(it.diambil) + ' oleh ' + esc(it.staf || '-') + '</span>'
       : '<span class="badge ok">Belum diambil</span>';
-    $('jpvInfo').hidden = false;
-    $('jpvAct').hidden = !!(r.expired || done);
+    $('jpvInfo').hidden = false; $('jpvAct').hidden = !!(r.expired || done);
     if (r.expired) say('Voucher ' + code + ' sudah kedaluwarsa (berlaku sampai 13 Des 2026).', 'bad');
-    else if (done) say('Voucher ' + code + ' (' + it.nama + ') sudah diambil ' + it.redeemedAt + ' oleh ' + (it.staffName || '-') + '.', 'bad');
+    else if (done) say('Voucher ' + code + ' (' + it.nama + ') sudah diambil ' + it.diambil + ' oleh ' + (it.staf || '-') + '.', 'bad');
     else {
       say('');
-      const w = await jpCross(it.whatsapp);
-      if (JP.code === code && w) { $('jpvWarn').textContent = w; $('jpvWarn').hidden = false; }
+      const s = r.silang;
+      if (s) {
+        $('jpvWarn').textContent = s.status === 'Diambil'
+          ? 'Nomor ini sudah mengambil kartu lewat sistem booth utama (tiket ' + s.tiket + ', ' + s.waktu + ', staf ' + s.staf + '). Pastikan tidak ganda sebelum menyerahkan.'
+          : 'Nomor ini juga terdaftar di sistem booth utama (tiket ' + s.tiket + ', belum diambil). Pastikan hanya satu kartu yang diserahkan.';
+        $('jpvWarn').hidden = false;
+      }
     }
-  } catch (e) { say(e.message || 'Koneksi bermasalah. Coba lagi.', 'bad'); }
+  } catch (e) { jpHide(); say(e.message || 'Koneksi bermasalah. Coba lagi.', 'bad'); }
 }
 
-$('jpPinOk').onclick = () => {
-  const v = $('jpPin').value.trim();
-  if (!v) return say('Isi PIN admin JP Landing.', 'bad');
-  jpPinSet(v); lookupJp(JP.code);
-};
-$('jpPin').addEventListener('keydown', e => { if (e.key === 'Enter') $('jpPinOk').click(); });
 $('jpvBatal').onclick = () => { jpHide(); say(''); };
 $('jpvOk').onclick = async () => {
   if (!JP.item) return;
   if (!$('jpvCek').checked) return say('Konfirmasi dulu bahwa identitas penerima sudah dicek.', 'bad');
-  const b = $('jpvOk'); b.disabled = true;
-  const code = JP.code;
+  const b = $('jpvOk'); b.disabled = true; const code = JP.code;
   try {
-    const r = await jpCall({ action: 'admin_redeem', pin: jpPin(), voucher: code, staffName: STAF }, 'Menyimpan serah terima');
-    if (r.status === 'redeemed') {
-      say('Tercatat: SIM untuk ' + r.redeemedItem.nama + ' (' + code + ') diserahkan.' + (r.remainingQuota != null ? ' Sisa kuota JP Landing: ' + r.remainingQuota + '.' : ''), 'good'); jpHide();
-    } else if (r.status === 'already_redeemed') {
-      const i = r.item || {}; say('Voucher ' + code + ' sudah diambil ' + (i.redeemedAt || '') + ' oleh ' + (i.staffName || '-') + '.', 'bad'); jpHide();
-    } else if (r.status === 'expired') { say(r.message || 'Voucher kedaluwarsa.', 'bad'); jpHide(); }
-    else if (r.status === 'unauthorized') { jpPinSet(''); say('PIN admin JP Landing tidak valid. Masukkan ulang.', 'bad'); lookupJp(code); }
-    else say(r.message || 'Gagal mencatat. Periksa status voucher lalu coba lagi.', 'bad');
+    const r = await call('booth_jp_serahkan', { voucher: code }, 'Menyimpan serah terima');
+    if (!r.ok) say(r.error, 'bad');
+    else if (r.status === 'redeemed') { say('Tercatat: SIM untuk ' + r.nama + ' (' + code + ') diserahkan.' + (r.sisa_kuota != null ? ' Sisa kuota JP Landing: ' + r.sisa_kuota + '.' : ''), 'good'); jpHide(); }
+    else if (r.status === 'already_redeemed') { say('Voucher ' + code + ' sudah diambil ' + (r.diambil || '') + ' oleh ' + (r.staf || '-') + '.', 'bad'); jpHide(); }
+    else if (r.status === 'expired') { say(r.message || 'Voucher kedaluwarsa.', 'bad'); jpHide(); }
+    else { say('Voucher ' + code + ' tidak ditemukan di JP Landing.', 'bad'); jpHide(); }
   } catch (e) { say('Koneksi bermasalah. Periksa status voucher sebelum mengulang.', 'bad'); }
   b.disabled = false;
 };
